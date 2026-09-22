@@ -12,6 +12,7 @@ function setup() {
 	    r: random(0, 10),
 	    vx: random(-1, 1),
 	    vy: random(-1, 1),
+	    color: random(255),
 	});
     }
 }
@@ -20,6 +21,7 @@ function draw() {
     background(220);
     for (let i = 0; i < ball_count; i++) {
 	let ball = balls[i];
+	fill(ball.color);
 	ball.x += ball.vx;
 	ball.y += ball.vy;
 	if (ball.x > width + ball.r) { ball.x = -ball.r; }
