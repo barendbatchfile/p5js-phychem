@@ -1,10 +1,14 @@
 let ball = { x: 60, y: 40, vx: 3.2, vy: 2.6, diameter: 30 };
 let paddleWidth = 80;
 let paddleHeight = 12;
+let paddleX = 0;
+let paddleY;
+let speed = 10;
 
 function setup() {
     createCanvas(320, 200);
     noStroke();
+    paddleY = height - 2 * paddleHeight;
 }
 
 function draw() {
@@ -13,8 +17,8 @@ function draw() {
     ball.x += ball.vx;
     ball.y += ball.vy;
 
-    let paddleX = constrain(mouseX, -paddleWidth/2, width - paddleWidth/2);
-    let paddleY = height - 2 * paddleHeight;
+    if (keyIsDown(LEFT_ARROW)) paddleX = constrain(paddleX - speed, -paddleWidth/2, width -paddleWidth/2);
+    if (keyIsDown(RIGHT_ARROW)) paddleX = constrain(paddleX + speed, -paddleWidth/2, width -paddleWidth/2);
 
     let ballBottom = ball.y + ball.diameter / 2;
 
