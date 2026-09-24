@@ -13,6 +13,19 @@ function draw() {
     ball.x += ball.vx;
     ball.y += ball.vy;
 
+    let paddleX = constrain(mouseX, -paddleWidth/2, width - paddleWidth/2);
+    let paddleY = height - 2 * paddleHeight;
+
+    let ballBottom = ball.y + ball.diameter / 2;
+
+    if (ballBottom > paddleY &&
+	ball.y < paddleY + paddleHeight &&
+	ball.x > paddleX &&
+	ball.x < paddleX + paddleWidth &&
+	ball.vy > 0) {
+	ball.vy = -ball.vy;
+    }
+
     let radius = ball.diameter / 2;
     if (ball.x - radius < 0)      { ball.x = radius;          ball.vx = -ball.vx; }
     if (ball.x + radius > width)  { ball.x = width - radius;  ball.vx = -ball.vx; }
@@ -22,5 +35,5 @@ function draw() {
     fill(60);
     circle(ball.x, ball.y, ball.diameter);
 
-    rect(constrain(mouseX, -paddleWidth/2, width - paddleWidth/2), height-2*paddleHeight, paddleWidth, paddleHeight, 5);
+    rect(paddleX, paddleY, paddleWidth, paddleHeight, 5);
 }
