@@ -1,4 +1,6 @@
 - [X] als de gebruiker het programma opent is er een assenstelsel.
+- [ ] de gebruiker kan navigeren door het assenstelsel met zowel de pijltjes toetsen, WASD, en de muis.
+- [ ] de gebruiker kan sneltoetsen aanpassen.
 - [ ] er zijn getallen met eenheid op de assenstelsel.
 - [ ] de gebruiker kan ik in en uit zoomen.
 - [ ] als de gebruiker het programma opent is er aan de rechterkant een menu met opties.
