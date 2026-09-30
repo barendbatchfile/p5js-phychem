@@ -17,9 +17,9 @@
 
 let lineSize = 2;
 let exponent = 0;
-let scale = 1;        // Actual scale is 1:scale*C, where C is some constant we don't care about.
+let scale = 1;
 let markDist = 300;
-let stepSize = markDist / (scale%10);
+let stepSize = markDist;
 let centerX = 0;
 let centerY = 0;
 let offset = { x: 0, y: 0, };
@@ -41,7 +41,6 @@ function mouseWheel(event) {
     if (scale <= 0) { scale = 0.1; }
     if (scale >= 10) { scale /= 10; exponent += 1; }
     if (scale < 0.1) { scale *= 10; exponent -= 1; }
-    console.log(scale);
     stepSize = markDist / scale;
     return false;
 }
@@ -67,16 +66,6 @@ function getUnit() {
     if (exponent >= 1 && exponent < 2) { return "dem"; }
     if (exponent >= 2 && exponent < 3) { return "hm"; }
     if (exponent >= 3) { return "km"; }
-}
-
-function calcMarkCount(begin, end) {
-    let step = begin;
-    for (let i = 1; true; i++) {
-	step += stepSize;
-	if (step > end) {
-	    return i + 1;
-	}
-    }
 }
 
 function mouseDragged() {
