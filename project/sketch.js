@@ -1,3 +1,20 @@
+/*  phychem-ulator is a physics and chemistry simulator.
+    Copyright (C) 2026 Barend Koster
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 let lineSize = 2;
 let exponent = 0;
 let scale = 1;        // Actual scale is 1:scale*C, where C is some constant we don't care about.
