@@ -7,6 +7,7 @@ let centerY = 0;
 let offset = { x: 0, y: 0, };
 let cursor = { x: 0, y: 0, };
 let cursorSpeed = 50;
+let textPadding = 5;
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
@@ -75,29 +76,45 @@ function handleKeys() {
 function drawCoordinatePlane() {
     let markCountX = calcMarkCount(centerX, width);
     let markCountY = calcMarkCount(centerY, height);
+    fill(0);
+    textSize(16);
 
-    fill(128);
     for (let i = 1; i < markCountX; i++) {
 	let x = centerX + stepSize * i;
 	rect(x, 0, lineSize, height);
+	let txt = i + "m";
+	let bounds = textBounds(txt, x, centerY);
+	text(txt, x + textPadding , centerY - bounds.h - textPadding);
     }
 
     for (let i = 1; i < markCountX; i++) {
 	let x = centerX + stepSize * -i;
 	rect(x, 0, lineSize, height);
+	let txt = -i + "m";
+	let bounds = textBounds(txt, x, centerY);
+	text(txt, x + textPadding , centerY - bounds.h - textPadding);
     }
 
     for (let i = 1; i < markCountY; i++) {
 	let y = centerY + stepSize * -i;
 	rect(0, y, width, lineSize);
+	let txt = i + "m";
+	let bounds = textBounds(txt, centerX, y);
+	text(txt, centerX + textPadding , y - bounds.h - textPadding);
     }
 
     for (let i = 1; i < markCountY; i++) {
 	let y = centerY + stepSize * i;
 	rect(0, y, width, lineSize);
+	let txt = -i + "m";
+	let bounds = textBounds(txt, centerX, y);
+	text(txt, centerX + textPadding , y - bounds.h - textPadding);
     }
 
-    fill(0);
+    let txt = 0 + "m";
+    let bounds = textBounds(txt, centerX, centerY);
+    text(txt, centerX + textPadding , centerY - bounds.h - textPadding);
+
     rect(centerX - lineSize, 0, 2 * lineSize, height);
     rect(0, centerY - lineSize, width, 2 * lineSize);
 }
