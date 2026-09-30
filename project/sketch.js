@@ -1,7 +1,8 @@
 let lineSize = 2;
+let exponent = 0;
 let scale = 1;        // Actual scale is 1:scale*C, where C is some constant we don't care about.
 let markDist = 300;
-let stepSize = markDist / (scale%1000);
+let stepSize = markDist / (scale%10);
 let centerX = 0;
 let centerY = 0;
 let offset = { x: 0, y: 0, };
@@ -17,6 +18,17 @@ function setup() {
     centerY = offset.y + cursor.y;
 }
 
+function mouseWheel(event) {
+    if (exponent < 3 && event.delta > 0) { scale *= 10};
+    if (exponent > -20 && event.delta < 0) { scale /= 10};
+    if (scale <= 0) { scale = 0.1; }
+    if (scale >= 10) { scale /= 10; exponent += 1; }
+    if (scale < 0.1) { scale *= 10; exponent -= 1; }
+    console.log(scale);
+    stepSize = markDist / scale;
+    return false;
+}
+
 function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
     offset.x = width / 2;
@@ -25,12 +37,27 @@ function windowResized() {
     centerX = offset.x + cursor.x;
 }
 
+function getUnit() {
+    if (exponent > -21 && exponent <= -18) { return "am"; }
+    if (exponent > -18 && exponent <= -15) { return "fm"; }
+    if (exponent > -15 && exponent <= -12) { return "pm"; }
+    if (exponent > -12 && exponent <= -9) { return "nm"; }
+    if (exponent > -9 && exponent <= -6) { return "μm"; }
+    if (exponent > -6 && exponent <= -3) { return "mm"; }
+    if (exponent > -3 && exponent <= -2) { return "cm"; }
+    if (exponent > -2 && exponent <= -1) { return "dm"; }
+    if (exponent > -1 && exponent < 1) { return "m"; }
+    if (exponent >= 1 && exponent < 2) { return "dem"; }
+    if (exponent >= 2 && exponent < 3) { return "hm"; }
+    if (exponent >= 3) { return "km"; }
+}
+
 function calcMarkCount(begin, end) {
     let step = begin;
-    for (let i = 0; true; i++) {
+    for (let i = 1; true; i++) {
 	step += stepSize;
 	if (step > end) {
-	    return step - stepSize;
+	    return i + 1;
 	}
     }
 }
@@ -74,46 +101,31 @@ function handleKeys() {
 }
 
 function drawCoordinatePlane() {
-    let markCountX = calcMarkCount(centerX, width);
-    let markCountY = calcMarkCount(centerY, height);
+    let minMarkY = Math.ceil((centerY - height) / stepSize);
+    let maxMarkY = Math.floor(centerY / stepSize);
+    let minMarkX = Math.ceil((0 - centerX) / stepSize);
+    let maxMarkX = Math.floor((width - centerX) / stepSize);
+
     fill(0);
     textSize(16);
 
-    for (let i = 1; i < markCountX; i++) {
-	let x = centerX + stepSize * i;
-	rect(x, 0, lineSize, height);
-	let txt = i + "m";
-	let bounds = textBounds(txt, x, centerY);
-	text(txt, x + textPadding , centerY - bounds.h - textPadding);
+    for (let i = minMarkX; i <= maxMarkX; i++) {
+        let x = centerX + i * stepSize;
+        rect(x, 0, lineSize, height);
+
+        let txt = i + getUnit();
+        let bounds = textBounds(txt, x, centerY);
+        text(txt, x + textPadding, centerY - bounds.h - textPadding);
     }
 
-    for (let i = 1; i < markCountX; i++) {
-	let x = centerX + stepSize * -i;
-	rect(x, 0, lineSize, height);
-	let txt = -i + "m";
-	let bounds = textBounds(txt, x, centerY);
-	text(txt, x + textPadding , centerY - bounds.h - textPadding);
-    }
+    for (let i = minMarkY; i <= maxMarkY; i++) {
+        let y = centerY - i * stepSize;
+        rect(0, y, width, lineSize);
 
-    for (let i = 1; i < markCountY; i++) {
-	let y = centerY + stepSize * -i;
-	rect(0, y, width, lineSize);
-	let txt = i + "m";
-	let bounds = textBounds(txt, centerX, y);
-	text(txt, centerX + textPadding , y - bounds.h - textPadding);
+        let txt = i + getUnit();
+        let bounds = textBounds(txt, centerX, y);
+        text(txt, centerX + textPadding, y - bounds.h - textPadding);
     }
-
-    for (let i = 1; i < markCountY; i++) {
-	let y = centerY + stepSize * i;
-	rect(0, y, width, lineSize);
-	let txt = -i + "m";
-	let bounds = textBounds(txt, centerX, y);
-	text(txt, centerX + textPadding , y - bounds.h - textPadding);
-    }
-
-    let txt = 0 + "m";
-    let bounds = textBounds(txt, centerX, centerY);
-    text(txt, centerX + textPadding , centerY - bounds.h - textPadding);
 
     rect(centerX - lineSize, 0, 2 * lineSize, height);
     rect(0, centerY - lineSize, width, 2 * lineSize);
