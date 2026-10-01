@@ -7,7 +7,7 @@
 - [ ] als de gebruiker het programma opent is er in het midden een stukje met informatie.
 - [ ] als de gebruiker het programma opent is er aan de linkerkant een menu waar atomen/moleculen kan worden gekozen.
 - [ ] als de gebruiker het programma opent is er een popup met gebruiks informatie.
-- [ ] de gebruiker kan atomen/moleculen plaatsen.
+- [X] de gebruiker kan atomen/moleculen plaatsen.
 - [ ] de gebruiker kan atomen/moleculen selecteren.
 - [ ] als zwaartekracht aan staat bewegenen atomen/moleculen.
 - [ ] moleculen veranderen de hele tijd van staat.
