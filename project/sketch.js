@@ -15,6 +15,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+let atoms = [];
+let current_atom = { name: "Un", n: 00, };
 let lineSize = 2;
 let exponent = 0;
 let scale = 1;
@@ -26,6 +28,7 @@ let offset = { x: 0, y: 0, };
 let cursor = { x: 0, y: 0, };
 let cursorSpeed = 50;
 let textPadding = 5;
+let dragging = false;
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
@@ -33,6 +36,18 @@ function setup() {
     offset.y = height / 2;
     centerX = offset.x + cursor.x;
     centerY = offset.y + cursor.y;
+}
+
+function mouseClicked() {
+    if (dragging) { return; }
+    let atom = {
+	name: current_atom.name,
+	n: current_atom.n,
+	x: mouseX - centerX,
+	y: mouseY - centerY,
+	r: 1.50,
+    };
+    atoms.push(atom);
 }
 
 function mouseWheel(event) {
@@ -73,6 +88,7 @@ function mouseDragged() {
     cursor.y += mouseY - pmouseY;
     centerY = offset.y + cursor.y;
     centerX = offset.x + cursor.x;
+    dragging = true;
 }
 
 function keyTyped() {
@@ -137,9 +153,44 @@ function drawCoordinatePlane() {
     rect(0, centerY - lineSize, width, 2 * lineSize);
 }
 
+function drawAtoms() {
+    for (let i = 0; i < atoms.length; i++) {
+	let atom = atoms[i];
+	let x = centerX + atom.x;
+	let y = centerY + atom.y;
+	fill(255);
+	circle(x, y, atom.r / (10**exponent));
+	let name = atom.name + "-" + atom.n;
+	let size = 16;
+	while (true) {
+	    textSize(size);
+	    let bounds = textBounds(name, x, y);
+	    let txtR = sqrt(bounds.w*bounds.w + bounds.h*bounds.h);
+	    let r = atom.r / (10**exponent);
+	    if (txtR > r) {
+		size -= 1;
+	    }
+
+	    if (size <= 0 || txtR <= r) {
+		console.log("w: " + bounds.w + ", txtR: " + txtR + ", r: " + r);
+		break;
+	    }
+	}
+
+	if (size > 0) {
+	    textSize(size);
+	    fill(0);
+	    let bounds = textBounds(name, x, y);
+	    text(name, x - bounds.w/2, y - bounds.h/2);
+	}
+    }
+}
+
 function draw() {
     background(255);
     fill(128, 255, 128);
+    dragging = false;
     handleKeys();
     drawCoordinatePlane();
+    drawAtoms();
 }
