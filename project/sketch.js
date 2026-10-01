@@ -38,25 +38,42 @@ function setup() {
     centerY = offset.y + cursor.y;
 }
 
+function mousePressed() {
+    dragging = false;
+}
+
 function mouseClicked() {
     if (dragging) { return; }
     let atom = {
 	name: current_atom.name,
 	n: current_atom.n,
-	x: mouseX - centerX,
-	y: mouseY - centerY,
+	x: (mouseX - centerX)* (scale*10**exponent),
+	y: (mouseY - centerY)* (scale*10**exponent),
+	c: "#00ff00",
 	r: 1.50,
     };
     atoms.push(atom);
+    console.log(atom.x);
+    console.log(scale*10**exponent);
 }
 
 function mouseWheel(event) {
-    if (exponent < 3 && event.delta > 0) { scale *= 10};
-    if (exponent > -20 && event.delta < 0) { scale /= 10};
+    let worldX = (mouseX - centerX) * scale * 10**exponent;
+    let worldY = (mouseY - centerY) * scale * 10**exponent;
+
+    if (exponent < 3 && event.delta > 0) { scale *= 6};
+    if (exponent > -20 && event.delta < 0) { scale /= 6};
     if (scale <= 0) { scale = 0.1; }
     if (scale >= 10) { scale /= 10; exponent += 1; }
     if (scale < 0.1) { scale *= 10; exponent -= 1; }
     stepSize = markDist / scale;
+
+    let newFactor = scale * 10 ** exponent;
+    centerX = mouseX - worldX / newFactor;
+    centerY = mouseY - worldY / newFactor;
+    cursor.x = centerX - offset.x;
+    cursor.y = centerY - offset.y;
+
     return false;
 }
 
@@ -97,6 +114,10 @@ function keyTyped() {
 	cursor.y = 0;
 	centerY = offset.y + cursor.y;
 	centerX = offset.x + cursor.x;
+
+	exponent = 0;
+	scale = 1;
+	stepSize = markDist / scale;
     }
 }
 
@@ -156,23 +177,22 @@ function drawCoordinatePlane() {
 function drawAtoms() {
     for (let i = 0; i < atoms.length; i++) {
 	let atom = atoms[i];
-	let x = centerX + atom.x;
-	let y = centerY + atom.y;
-	fill(255);
-	circle(x, y, atom.r / (10**exponent));
+	let x = centerX + atom.x / (scale*10**exponent);
+	let y = centerY + atom.y / (scale*10**exponent);
+	fill(atom.c);
+	circle(x, y, atom.r / (scale*10**exponent));
 	let name = atom.name + "-" + atom.n;
-	let size = 16;
+	let size = 160;
 	while (true) {
 	    textSize(size);
 	    let bounds = textBounds(name, x, y);
 	    let txtR = sqrt(bounds.w*bounds.w + bounds.h*bounds.h);
-	    let r = atom.r / (10**exponent);
+	    let r = atom.r / (scale*10**exponent);
 	    if (txtR > r) {
 		size -= 1;
 	    }
 
 	    if (size <= 0 || txtR <= r) {
-		console.log("w: " + bounds.w + ", txtR: " + txtR + ", r: " + r);
 		break;
 	    }
 	}
@@ -181,7 +201,7 @@ function drawAtoms() {
 	    textSize(size);
 	    fill(0);
 	    let bounds = textBounds(name, x, y);
-	    text(name, x - bounds.w/2, y - bounds.h/2);
+	    text(name, x - bounds.w/2, y);
 	}
     }
 }
@@ -189,7 +209,6 @@ function drawAtoms() {
 function draw() {
     background(255);
     fill(128, 255, 128);
-    dragging = false;
     handleKeys();
     drawCoordinatePlane();
     drawAtoms();
