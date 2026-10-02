@@ -70,8 +70,8 @@ function mousePressed() {
 
 function mouseClicked() {
     textSize(16);
-    let scaleStatus = " -- scale = " + scale*10**exponent + " -- ";
-    let atomStatus = " -- total atom count = " + atoms.length + " -- ";
+    let scaleStatus = " -- scale = 1:" + scale*10**exponent + " -- ";
+    let atomStatus = " -- atoms = " + atoms.length + " -- ";
     let buttonText = "Reset simulator";
     let buttonBounds = textBounds(buttonText, width/2, 0);
     let scaleBounds = textBounds(scaleStatus, width/2, 0);
@@ -330,8 +330,8 @@ function drawAtoms() {
 function drawHud() {
     textSize(16);
     noStroke();
-    let scaleStatus = " -- scale = " + scale*10**exponent + " -- ";
-    let atomStatus = " -- total atom count = " + atoms.length + " -- ";
+    let scaleStatus = " -- scale = 1:" + scale*10**exponent + " -- ";
+    let atomStatus = " -- atoms = " + atoms.length + " -- ";
 
     let buttonText = "Reset simulator";
     let buttonBounds = textBounds(buttonText, width/2, 0);
