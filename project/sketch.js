@@ -52,7 +52,7 @@ let centerY = 0;
 let offset = { x: 0, y: 0, };
 let cursor = { x: 0, y: 0, };
 let cursorSpeed = 50;
-let textPadding = 5;
+let padding = 5;
 let dragging = false;
 
 function setup() {
@@ -68,6 +68,33 @@ function mousePressed() {
 }
 
 function mouseClicked() {
+    textSize(16);
+    let scaleStatus = " -- scale = " + scale*10**exponent + " -- ";
+    let atomStatus = " -- total atom count = " + atoms.length + " -- ";
+    let buttonText = "Reset simulator";
+    let buttonBounds = textBounds(buttonText, width/2, 0);
+    let scaleBounds = textBounds(scaleStatus, width/2, 0);
+    let atomBounds = textBounds(atomStatus, width/2, 0);
+    let barHeight = max(scaleBounds.h, atomBounds.h) + padding;
+    let barWidth = buttonBounds.w + scaleBounds.w + atomBounds.w + 2*padding;
+    let x = width/2 - barWidth/2;
+    if (mouseX > x+scaleBounds.w+padding &&
+	mouseX < x+scaleBounds.w+padding+buttonBounds.w &&
+	mouseY > 2*padding &&
+	mouseY < barHeight + 2*padding) {
+
+	cursor.x = 0;
+	cursor.y = 0;
+	centerY = offset.y + cursor.y;
+	centerX = offset.x + cursor.x;
+
+	exponent = 0;
+	scale = 1;
+	stepSize = markDist / scale;
+	atoms = [];
+	return;
+    }
+
     if (dragging) { return; }
 
     let atom = Object.create(current_atom);
@@ -237,6 +264,7 @@ function drawCoordinatePlane() {
     let maxMarkX = Math.floor((width - centerX) / stepSize);
 
     fill(0);
+    stroke(0);
     textSize(16);
 
     for (let i = minMarkX; i <= maxMarkX; i++) {
@@ -245,7 +273,7 @@ function drawCoordinatePlane() {
 
 	let txt = i + getUnit();
 	let bounds = textBounds(txt, x, centerY);
-	text(txt, x + textPadding, centerY - bounds.h - textPadding);
+	text(txt, x + padding, centerY - bounds.h - padding);
     }
 
     for (let i = minMarkY; i <= maxMarkY; i++) {
@@ -254,7 +282,7 @@ function drawCoordinatePlane() {
 
 	let txt = i + getUnit();
 	let bounds = textBounds(txt, centerX, y);
-	text(txt, centerX + textPadding, y - bounds.h - textPadding);
+	text(txt, centerX + padding, y - bounds.h - padding);
     }
 
     rect(centerX - lineSize, 0, 2 * lineSize, height);
@@ -294,11 +322,49 @@ function drawAtoms() {
     }
 }
 
+function drawHud() {
+    textSize(16);
+    noStroke();
+    let scaleStatus = " -- scale = " + scale*10**exponent + " -- ";
+    let atomStatus = " -- total atom count = " + atoms.length + " -- ";
+
+    let buttonText = "Reset simulator";
+    let buttonBounds = textBounds(buttonText, width/2, 0);
+
+    let scaleBounds = textBounds(scaleStatus, width/2, 0);
+    let atomBounds = textBounds(atomStatus, width/2, 0);
+    let barHeight = max(scaleBounds.h, atomBounds.h) + padding;
+    let barWidth = buttonBounds.w + scaleBounds.w + atomBounds.w + 2*padding;
+
+    fill(255);
+    let x = width/2 - barWidth/2;
+    rect(x, 2*padding, barWidth, barHeight + padding);
+    circle(x, barHeight/2 + 2.5*padding, barHeight + padding);
+    circle(x+barWidth, barHeight/2 + 2.5*padding, barHeight + padding);
+    stroke(0);
+    fill(0);
+    text(scaleStatus, x, 2*padding + barHeight);
+    text(atomStatus, x+scaleBounds.w+2*padding+buttonBounds.w, 2*padding + barHeight);
+
+    if (mouseX > x+scaleBounds.w+padding &&
+	mouseX < x+scaleBounds.w+padding+buttonBounds.w &&
+	mouseY > 2*padding &&
+	mouseY < barHeight + 2*padding) {
+	stroke(127, 127, 255);
+	fill(127, 127, 255);
+    } else {
+	stroke(255, 127, 127);
+	fill(255, 127, 127);
+    }
+    text(buttonText, x+scaleBounds.w+padding, 2*padding + barHeight);
+}
+
 function draw() {
-    background(255);
+    background(172);
     fill(128, 255, 128);
     handleKeys();
     processPhyics();
     drawCoordinatePlane();
     drawAtoms();
+    drawHud();
 }
