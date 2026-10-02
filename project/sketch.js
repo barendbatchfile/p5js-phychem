@@ -16,7 +16,16 @@
 */
 
 let atoms = [];
-let current_atom = { name: "Un", n: 00, };
+let current_atom = {
+    name: "Un",
+    n: 0,
+    m: 1,
+    x: 0,
+    y: 0,
+    c: "#00ff00",
+    r: 1.5e-10,
+};
+
 let lineSize = 2;
 let exponent = 0;
 let scale = 1;
@@ -44,36 +53,31 @@ function mousePressed() {
 
 function mouseClicked() {
     if (dragging) { return; }
-    let atom = {
-	name: current_atom.name,
-	n: current_atom.n,
-	x: (mouseX - centerX)* (scale*10**exponent),
-	y: (mouseY - centerY)* (scale*10**exponent),
-	c: "#00ff00",
-	r: 1.50,
-    };
+
+    let atom = Object.create(current_atom);
+    atom.x = (mouseX - centerX) * (scale*10**exponent) / stepSize;
+    atom.y = (mouseY - centerY) * (scale*10**exponent) / stepSize;
     atoms.push(atom);
-    console.log(atom.x);
-    console.log(scale*10**exponent);
 }
 
 function mouseWheel(event) {
-    let worldX = (mouseX - centerX) * scale * 10**exponent;
-    let worldY = (mouseY - centerY) * scale * 10**exponent;
+    let oldPixelsPerUnit = stepSize / (scale*10**exponent);
 
-    if (exponent < 3 && event.delta > 0) { scale *= 6};
-    if (exponent > -20 && event.delta < 0) { scale /= 6};
+    if (exponent < 3 && event.delta > 0) { scale *= 2};
+    if (exponent > -20 && event.delta < 0) { scale /= 2};
     if (scale <= 0) { scale = 0.1; }
     if (scale >= 10) { scale /= 10; exponent += 1; }
     if (scale < 0.1) { scale *= 10; exponent -= 1; }
     stepSize = markDist / scale;
 
-    let newFactor = scale * 10 ** exponent;
-    centerX = mouseX - worldX / newFactor;
-    centerY = mouseY - worldY / newFactor;
-    cursor.x = centerX - offset.x;
-    cursor.y = centerY - offset.y;
-
+    let newPixelsPerUnit = stepSize / (scale*10**exponent);
+    let zoomRatio = newPixelsPerUnit / oldPixelsPerUnit;
+    cursor.x = mouseX - offset.x
+        - (mouseX - offset.x - cursor.x) * zoomRatio;
+    cursor.y = mouseY - offset.y
+        - (mouseY - offset.y - cursor.y) * zoomRatio;
+    centerX = offset.x + cursor.x;
+    centerY = offset.y + cursor.y;
     return false;
 }
 
@@ -153,21 +157,21 @@ function drawCoordinatePlane() {
     textSize(16);
 
     for (let i = minMarkX; i <= maxMarkX; i++) {
-        let x = centerX + i * stepSize;
-        rect(x, 0, lineSize, height);
+	let x = centerX + i * stepSize;
+	rect(x, 0, lineSize, height);
 
-        let txt = i + getUnit();
-        let bounds = textBounds(txt, x, centerY);
-        text(txt, x + textPadding, centerY - bounds.h - textPadding);
+	let txt = i + getUnit();
+	let bounds = textBounds(txt, x, centerY);
+	text(txt, x + textPadding, centerY - bounds.h - textPadding);
     }
 
     for (let i = minMarkY; i <= maxMarkY; i++) {
-        let y = centerY - i * stepSize;
-        rect(0, y, width, lineSize);
+	let y = centerY - i * stepSize;
+	rect(0, y, width, lineSize);
 
-        let txt = i + getUnit();
-        let bounds = textBounds(txt, centerX, y);
-        text(txt, centerX + textPadding, y - bounds.h - textPadding);
+	let txt = i + getUnit();
+	let bounds = textBounds(txt, centerX, y);
+	text(txt, centerX + textPadding, y - bounds.h - textPadding);
     }
 
     rect(centerX - lineSize, 0, 2 * lineSize, height);
@@ -177,22 +181,23 @@ function drawCoordinatePlane() {
 function drawAtoms() {
     for (let i = 0; i < atoms.length; i++) {
 	let atom = atoms[i];
-	let x = centerX + atom.x / (scale*10**exponent);
-	let y = centerY + atom.y / (scale*10**exponent);
+	let x = centerX + atom.x / (scale*10**exponent) * stepSize;
+	let y = centerY + atom.y / (scale*10**exponent) * stepSize;
+	let d = max(5, 2 * atom.r * stepSize / (scale * 10 ** exponent));
+
 	fill(atom.c);
-	circle(x, y, atom.r / (scale*10**exponent));
+	circle(x, y, d);
 	let name = atom.name + "-" + atom.n;
 	let size = 160;
 	while (true) {
 	    textSize(size);
 	    let bounds = textBounds(name, x, y);
 	    let txtR = sqrt(bounds.w*bounds.w + bounds.h*bounds.h);
-	    let r = atom.r / (scale*10**exponent);
-	    if (txtR > r) {
+	    if (txtR > d) {
 		size -= 1;
 	    }
 
-	    if (size <= 0 || txtR <= r) {
+	    if (size <= 0 || txtR <= d) {
 		break;
 	    }
 	}
