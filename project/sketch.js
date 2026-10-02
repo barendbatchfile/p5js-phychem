@@ -27,14 +27,15 @@ let current_atom = {
     c: "#00ff00",
     r: 5.3e-11,
 };
-
 let phyicsSettings = {
     gravity: true,
     movement: true,
     timeMultiplier: 1,
     gravityMultiplier: 1e8,
     softening: true,
+    softeningConst: 2,
     bounce: true,
+    pause: false,
 };
 
 let phyicsConstents = {
@@ -145,7 +146,7 @@ function processGravity(dt) {
 	    let dy = atomB.y - atomA.y;
 	    let r;
 	    if (phyicsSettings.softening) {
-		let softening = atomA.r + atomB.r;
+		let softening = phyicsSettings.softeningConst * (atomA.r + atomB.r);
 		r = sqrt(dx * dx + dy * dy + softening * softening);
 	    } else {
 		r = sqrt(dx * dx + dy * dy);
@@ -232,6 +233,10 @@ function keyTyped() {
 	exponent = 0;
 	scale = 1;
 	stepSize = markDist / scale;
+    }
+
+    if (key === 'p') {
+	phyicsSettings.pause = !phyicsSettings.pause;
     }
 }
 
@@ -356,14 +361,29 @@ function drawHud() {
 	stroke(255, 127, 127);
 	fill(255, 127, 127);
     }
+
     text(buttonText, x+scaleBounds.w+padding, 2*padding + barHeight);
+
+    if (phyicsSettings.pause) {
+	let pauseBounds = textBounds("pauzed", width/2, barHeight + 6*padding);
+	fill(255);
+	stroke(255);
+	let x = width/2 - pauseBounds.w/2 - padding/2;
+	let y = 6*padding + padding + pauseBounds.h;
+	rect(x, y, padding+pauseBounds.w, padding+pauseBounds.h);
+	circle(x, y+pauseBounds.h/2+padding/2, pauseBounds.h+padding);
+	circle(x+pauseBounds.w+padding, y+pauseBounds.h/2+padding/2, pauseBounds.h+padding);
+	stroke(0);
+	fill(0);
+	text("pauzed", x+padding, y+pauseBounds.h);
+    }
 }
 
 function draw() {
     background(172);
     fill(128, 255, 128);
     handleKeys();
-    processPhyics();
+    if (!phyicsSettings.pause) { processPhyics(); }
     drawCoordinatePlane();
     drawAtoms();
     drawHud();
