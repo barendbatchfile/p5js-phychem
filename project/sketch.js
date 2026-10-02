@@ -17,13 +17,28 @@
 
 let atoms = [];
 let current_atom = {
-    name: "Un",
-    n: 0,
+    name: "H",
+    number: 1,
     m: 1,
     x: 0,
     y: 0,
+    vx: 0,
+    vy: 0,
     c: "#00ff00",
-    r: 1.5e-10,
+    r: 5.3e-11,
+};
+
+let phyicsSettings = {
+    gravity: true,
+    movement: true,
+    timeMultiplier: 1,
+    gravityMultiplier: 1e8,
+    softening: true,
+};
+
+let phyicsConstents = {
+    gravity: 6.67384e-11,
+    atomicMass: 1.660538921e-27,
 };
 
 let lineSize = 2;
@@ -87,6 +102,47 @@ function windowResized() {
     offset.y = height / 2;
     centerY = offset.y + cursor.y;
     centerX = offset.x + cursor.x;
+}
+
+function processPhyics() {
+    let dt = deltaTime * phyicsSettings.timeMultiplier / 1000; //convert deltaTime from miliseconds to seconds.
+    if (phyicsSettings.gravity) {
+	for (let i = 0; i < atoms.length; i++) {
+	    let atomA = atoms[i];
+
+	    for (let j = 0; j < atoms.length; j++) {
+		if (i === j) { continue; }
+		let atomB = atoms[j];
+		let massB = atomB.m * phyicsConstents.atomicMass; // convert mass in u to kg.
+
+		let dx = atomB.x - atomA.x;
+		let dy = atomB.y - atomA.y;
+		let r;
+		if (phyicsSettings.softening) {
+		    let softening = atomA.r + atomB.r;
+		    r = sqrt(dx * dx + dy * dy + softening * softening);
+		} else {
+		    r = sqrt(dx * dx + dy * dy);
+		}
+
+		if (r === 0) { continue; }
+
+		let a = phyicsConstents.gravity * massB / (r**2) * phyicsSettings.gravityMultiplier;
+		let ax = a * dx / r;
+		let ay = a * dy / r;
+
+		atomA.vx += ax * dt;
+		atomA.vy += ay * dt;
+	    }
+	}
+    }
+
+    if (phyicsSettings.movement) {
+	for (let i = 0; i < atoms.length; i++) {
+	    atoms[i].x += atoms[i].vx * dt;
+	    atoms[i].y += atoms[i].vy * dt;
+	}
+    }
 }
 
 function getUnit() {
@@ -187,7 +243,7 @@ function drawAtoms() {
 
 	fill(atom.c);
 	circle(x, y, d);
-	let name = atom.name + "-" + atom.n;
+	let name = atom.name + "-" + atom.number;
 	let size = 160;
 	while (true) {
 	    textSize(size);
@@ -215,6 +271,7 @@ function draw() {
     background(255);
     fill(128, 255, 128);
     handleKeys();
+    processPhyics();
     drawCoordinatePlane();
     drawAtoms();
 }

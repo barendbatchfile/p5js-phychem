@@ -9,7 +9,8 @@
 - [ ] als de gebruiker het programma opent is er een popup met gebruiks informatie.
 - [X] de gebruiker kan atomen/moleculen plaatsen.
 - [ ] de gebruiker kan atomen/moleculen selecteren.
-- [ ] als zwaartekracht aan staat bewegenen atomen/moleculen.
+- [X] als zwaartekracht aan staat bewegenen atomen/moleculen.
+- [ ] atomen bewegen niet door elkaar heen maar botsen.
 - [ ] moleculen veranderen de hele tijd van staat.
 - [ ] de gebruiker kan de simulatie pauzeren.
 - [ ] reacties kunnen plaats vinden.
