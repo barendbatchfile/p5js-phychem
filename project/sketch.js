@@ -201,7 +201,7 @@ function drawAtoms() {
 	    textSize(size);
 	    fill(0);
 	    let bounds = textBounds(name, x, y);
-	    text(name, x - bounds.w/2, y);
+	    text(name, x - bounds.w/2, y+bounds.h/2);
 	}
     }
 }
