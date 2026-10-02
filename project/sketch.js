@@ -34,6 +34,7 @@ let phyicsSettings = {
     timeMultiplier: 1,
     gravityMultiplier: 1e8,
     softening: true,
+    bounce: true,
 };
 
 let phyicsConstents = {
@@ -104,35 +105,61 @@ function windowResized() {
     centerX = offset.x + cursor.x;
 }
 
+function processGravity(dt) {
+    for (let i = 0; i < atoms.length; i++) {
+	let atomA = atoms[i];
+
+	for (let j = 0; j < atoms.length; j++) {
+	    if (i === j) { continue; }
+	    let atomB = atoms[j];
+	    let massB = atomB.m * phyicsConstents.atomicMass; // convert mass in u to kg.
+
+	    let dx = atomB.x - atomA.x;
+	    let dy = atomB.y - atomA.y;
+	    let r;
+	    if (phyicsSettings.softening) {
+		let softening = atomA.r + atomB.r;
+		r = sqrt(dx * dx + dy * dy + softening * softening);
+	    } else {
+		r = sqrt(dx * dx + dy * dy);
+	    }
+
+	    if (r === 0) { continue; }
+
+	    let a = phyicsConstents.gravity * massB / (r**2) * phyicsSettings.gravityMultiplier;
+	    let ax = a * dx / r;
+	    let ay = a * dy / r;
+
+	    atomA.vx += ax * dt;
+	    atomA.vy += ay * dt;
+	}
+    }
+}
+
+function bounce(atomA, atomB) {
+    let tempV = atomA.vx;
+    atomA.vx = atomB.vx;
+    atomB.vx = tempV;
+
+    tempV = atomA.vy;
+    atomA.vy = atomB.vy;
+    atomB.vy = tempV;
+}
+
 function processPhyics() {
     let dt = deltaTime * phyicsSettings.timeMultiplier / 1000; //convert deltaTime from miliseconds to seconds.
     if (phyicsSettings.gravity) {
+	processGravity(dt);
+    }
+
+    if (phyicsSettings.bounce) {
 	for (let i = 0; i < atoms.length; i++) {
 	    let atomA = atoms[i];
 
-	    for (let j = 0; j < atoms.length; j++) {
-		if (i === j) { continue; }
+	    for (let j = i + 1; j < atoms.length; j++) {
 		let atomB = atoms[j];
-		let massB = atomB.m * phyicsConstents.atomicMass; // convert mass in u to kg.
-
-		let dx = atomB.x - atomA.x;
-		let dy = atomB.y - atomA.y;
-		let r;
-		if (phyicsSettings.softening) {
-		    let softening = atomA.r + atomB.r;
-		    r = sqrt(dx * dx + dy * dy + softening * softening);
-		} else {
-		    r = sqrt(dx * dx + dy * dy);
-		}
-
-		if (r === 0) { continue; }
-
-		let a = phyicsConstents.gravity * massB / (r**2) * phyicsSettings.gravityMultiplier;
-		let ax = a * dx / r;
-		let ay = a * dy / r;
-
-		atomA.vx += ax * dt;
-		atomA.vy += ay * dt;
+		let distance = dist(atomA.x , atomA.y, atomB.x, atomB.y);
+		if (distance <= atomA.r + atomB.r) bounce(atomA, atomB);
 	    }
 	}
     }
