@@ -27,6 +27,18 @@ let current_atom = {
     c: "#00ff00",
     r: 5.3e-11,
 };
+
+let buttons = [
+    {
+	label: "Reset simulator",
+	x: -100,
+	y: -100,
+	w: 0,
+	h: 0,
+	id: 0,
+    },
+];
+
 let phyicsSettings = {
     gravity: true,
     movement: true,
@@ -56,43 +68,65 @@ let cursorSpeed = 50;
 let padding = 5;
 let dragging = false;
 
-function setup() {
-    createCanvas(windowWidth, windowHeight);
+let bar = {
+    x: 0,
+    w: 0,
+    h: 0,
+    y: 2 * padding,
+}
+
+function updateButton(id) {
+    textSize(16);
+    let bounds = textBounds(buttons[id].label, width/2, id);
+    buttons[id].w = bounds.w;
+    buttons[id].h = bounds.h;
+    buttons[id].x = width/2 - buttons[id].w/2;
+    buttons[id].y = 3*padding + buttons[id].h;
+}
+
+function updateCenter() {
     offset.x = width / 2;
     offset.y = height / 2;
     centerX = offset.x + cursor.x;
     centerY = offset.y + cursor.y;
 }
 
+function setup() {
+    createCanvas(windowWidth, windowHeight);
+    updateCenter();
+    updateButton(0);
+}
+
 function mousePressed() {
     dragging = false;
 }
 
+function drawButton(id) {
+    text(buttons[0].label, buttons[0].x, buttons[0].y);
+}
+
+function isMouseOverButton(id) {
+    return (mouseX > buttons[id].x &&
+	    mouseX < buttons[id].x + buttons[id].w &&
+	    mouseY > buttons[id].y - buttons[id].h &&
+	    mouseY < buttons[id].y);
+}
+
+function resetGame() {
+    cursor.x = 0;
+    cursor.y = 0;
+    centerY = offset.y + cursor.y;
+    centerX = offset.x + cursor.x;
+
+    exponent = 0;
+    scale = 1;
+    stepSize = markDist / scale;
+    atoms = [];
+}
+
 function mouseClicked() {
-    textSize(16);
-    let scaleStatus = " -- scale = 1:" + scale*10**exponent + " -- ";
-    let atomStatus = " -- atoms = " + atoms.length + " -- ";
-    let buttonText = "Reset simulator";
-    let buttonBounds = textBounds(buttonText, width/2, 0);
-    let scaleBounds = textBounds(scaleStatus, width/2, 0);
-    let atomBounds = textBounds(atomStatus, width/2, 0);
-    let barHeight = max(scaleBounds.h, atomBounds.h) + padding;
-    let barWidth = buttonBounds.w + scaleBounds.w + atomBounds.w + 2*padding;
-    let x = width/2 - barWidth/2;
-    if (mouseX > x+scaleBounds.w+padding &&
-	mouseX < x+scaleBounds.w+padding+buttonBounds.w &&
-	mouseY > 2*padding &&
-	mouseY < barHeight + 2*padding) {
-
-	cursor.x = 0;
-	cursor.y = 0;
-	centerY = offset.y + cursor.y;
-	centerX = offset.x + cursor.x;
-
-	exponent = 0;
-	scale = 1;
-	stepSize = markDist / scale;
-	atoms = [];
+    if (isMouseOverButton(0)) {
+	resetGame();
 	return;
     }
 
@@ -127,10 +161,8 @@ function mouseWheel(event) {
 
 function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
-    offset.x = width / 2;
-    offset.y = height / 2;
-    centerY = offset.y + cursor.y;
-    centerX = offset.x + cursor.x;
+    updateCenter();
+    updateButton(0);
 }
 
 function processGravity(dt) {
@@ -210,7 +242,7 @@ function getUnit() {
     if (exponent > -3 && exponent <= -2) { return "cm"; }
     if (exponent > -2 && exponent <= -1) { return "dm"; }
     if (exponent > -1 && exponent < 1) { return "m"; }
-    if (exponent >= 1 && exponent < 2) { return "dem"; }
+    if (exponent >= 1 && exponent < 2) { return "dam"; }
     if (exponent >= 2 && exponent < 3) { return "hm"; }
     if (exponent >= 3) { return "km"; }
 }
@@ -225,14 +257,7 @@ function mouseDragged() {
 
 function keyTyped() {
     if (key === 'r') {
-	cursor.x = 0;
-	cursor.y = 0;
-	centerY = offset.y + cursor.y;
-	centerX = offset.x + cursor.x;
-
-	exponent = 0;
-	scale = 1;
-	stepSize = markDist / scale;
+	resetGame();
     }
 
     if (key === 'p') {
@@ -333,50 +358,52 @@ function drawHud() {
     let scaleStatus = " -- scale = 1:" + scale*10**exponent + " -- ";
     let atomStatus = " -- atoms = " + atoms.length + " -- ";
 
-    let buttonText = "Reset simulator";
-    let buttonBounds = textBounds(buttonText, width/2, 0);
-
     let scaleBounds = textBounds(scaleStatus, width/2, 0);
     let atomBounds = textBounds(atomStatus, width/2, 0);
-    let barHeight = max(scaleBounds.h, atomBounds.h) + padding;
-    let barWidth = buttonBounds.w + scaleBounds.w + atomBounds.w + 2*padding;
 
+    // recompute new bar.
+    bar.h = buttons[0].h + 2*padding;
+    bar.w = buttons[0].w + scaleBounds.w + atomBounds.w + 2*padding;
+    bar.x = buttons[0].x - scaleBounds.w;
+
+    // draw bar
     fill(255);
-    let x = width/2 - barWidth/2;
-    rect(x, 2*padding, barWidth, barHeight + padding);
-    circle(x, barHeight/2 + 2.5*padding, barHeight + padding);
-    circle(x+barWidth, barHeight/2 + 2.5*padding, barHeight + padding);
+    rect(bar.x, bar.y, bar.w, bar.h);
+    circle(bar.x, bar.h/2 + bar.y, bar.h);
+    circle(bar.x+bar.w, bar.h/2 + bar.y, bar.h);
+
+    // draw text around button.
     stroke(0);
     fill(0);
-    text(scaleStatus, x, 2*padding + barHeight);
-    text(atomStatus, x+scaleBounds.w+2*padding+buttonBounds.w, 2*padding + barHeight);
+    text(scaleStatus, bar.x, bar.y + scaleBounds.h + padding);
+    text(atomStatus, buttons[0].x + buttons[0].w, bar.y + atomBounds.h + padding);
 
-    if (mouseX > x+scaleBounds.w+padding &&
-	mouseX < x+scaleBounds.w+padding+buttonBounds.w &&
-	mouseY > 2*padding &&
-	mouseY < barHeight + 2*padding) {
-	stroke(127, 127, 255);
-	fill(127, 127, 255);
-    } else {
-	stroke(255, 127, 127);
-	fill(255, 127, 127);
+    // button hover effect.
+    let color = "#ff7777";
+    if (isMouseOverButton(0)) {
+	color = "#7777ff";
     }
 
-    text(buttonText, x+scaleBounds.w+padding, 2*padding + barHeight);
+    stroke(color);
+    fill(color);
+    drawButton(0);
 
+    // draw if game is pauzed
     if (phyicsSettings.pause) {
-	let pauseBounds = textBounds("pauzed", width/2, barHeight + 6*padding);
+	let pauseBounds = textBounds("pauzed", width/2, height);
+	let y = height - pauseBounds.h - 4*padding;
+	let x = width/2 - pauseBounds.w/2;
+
 	fill(255);
 	stroke(255);
-	let x = width/2 - pauseBounds.w/2 - padding/2;
-	let y = 6*padding + padding + pauseBounds.h;
-	rect(x, y, padding+pauseBounds.w, padding+pauseBounds.h);
-	circle(x, y+pauseBounds.h/2+padding/2, pauseBounds.h+padding);
-	circle(x+pauseBounds.w+padding, y+pauseBounds.h/2+padding/2, pauseBounds.h+padding);
+	rect(x, y, pauseBounds.w, padding+pauseBounds.h);
+	circle(x, y+pauseBounds.h/2 + padding/2, pauseBounds.h+padding);
+	circle(x+pauseBounds.w, y+pauseBounds.h/2+padding/2, pauseBounds.h+padding);
 	stroke(0);
 	fill(0);
-	text("pauzed", x+padding, y+pauseBounds.h);
+	text("pauzed", x, y+pauseBounds.h);
     }
+
 }
 
 function draw() {
