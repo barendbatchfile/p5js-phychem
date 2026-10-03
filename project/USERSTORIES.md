@@ -3,7 +3,7 @@
 - [ ] de gebruiker kan sneltoetsen aanpassen.
 - [X] er zijn getallen met eenheid op de assenstelsel.
 - [X] de gebruiker kan ik in en uit zoomen.
-- [ ] als de gebruiker het programma opent is er aan de rechterkant een menu met opties.
+- [X] als de gebruiker het programma opent is er aan de rechterkant een menu met opties.
 - [X] als de gebruiker het programma opent is er in het midden een stukje met informatie.
 - [ ] als de gebruiker het programma opent is er aan de linkerkant een menu waar atomen/moleculen kan worden gekozen.
 - [ ] als de gebruiker het programma opent is er een popup met gebruiks informatie.
@@ -12,7 +12,7 @@
 - [X] als zwaartekracht aan staat bewegenen atomen/moleculen.
 - [X] atomen bewegen niet door elkaar heen maar botsen.
 - [ ] moleculen veranderen de hele tijd van staat.
-- [ ] de gebruiker kan de simulatie pauzeren.
+- [X] de gebruiker kan de simulatie pauzeren.
 - [ ] reacties kunnen plaats vinden.
 - [ ] de gebruiker kan de snelheid aanpassen.
 - [ ] atomen kunnen vervallen.
