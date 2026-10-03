@@ -28,17 +28,6 @@ let current_atom = {
     r: 5.3e-11,
 };
 
-let buttons = [
-    {
-	label: "Reset simulator",
-	x: -100,
-	y: -100,
-	w: 0,
-	h: 0,
-	id: 0,
-    },
-];
-
 let phyicsSettings = {
     gravity: true,
     movement: true,
@@ -55,6 +44,7 @@ let phyicsConstents = {
     atomicMass: 1.660538921e-27,
 };
 
+let physicsSettingsOpen = false;
 let lineSize = 2;
 let exponent = 0;
 let scale = 1;
@@ -75,13 +65,43 @@ let bar = {
     y: 2 * padding,
 }
 
+let buttons = [
+    {
+	label: "Reset simulator",
+	x: -100,
+	y: -100,
+	w: 0,
+	h: 0,
+    },
+    {
+	label: "physics settings",
+	x: 0,
+	y: 0,
+	w: 0,
+	h: 0,
+    },
+];
+
 function updateButton(id) {
     textSize(16);
     let bounds = textBounds(buttons[id].label, width/2, id);
-    buttons[id].w = bounds.w;
-    buttons[id].h = bounds.h;
-    buttons[id].x = width/2 - buttons[id].w/2;
-    buttons[id].y = 3*padding + buttons[id].h;
+    if (id === 0) {
+	buttons[id].w = bounds.w;
+	buttons[id].h = bounds.h;
+	buttons[id].x = width/2 - buttons[id].w/2;
+	buttons[id].y = 3*padding + buttons[id].h;
+    } else if (id === 1) {
+	buttons[id].w = bounds.w;
+	buttons[id].h = bounds.h;
+	buttons[id].y = 2*padding + buttons[id].h;
+	buttons[id].x = padding + buttons[id].h;
+    }
+}
+
+function updateButtons() {
+    for (let i = 0; i < buttons.length; i++) {
+	updateButton(i);
+    }
 }
 
 function updateCenter() {
@@ -94,7 +114,7 @@ function updateCenter() {
 function setup() {
     createCanvas(windowWidth, windowHeight);
     updateCenter();
-    updateButton(0);
+    updateButtons();
 }
 
 function mousePressed() {
@@ -102,7 +122,14 @@ function mousePressed() {
 }
 
 function drawButton(id) {
-    text(buttons[0].label, buttons[0].x, buttons[0].y);
+    let color = "#ff7777";
+    if (isMouseOverButton(id)) {
+	color = "#7777ff";
+    }
+
+    stroke(color);
+    fill(color);
+    text(buttons[id].label, buttons[id].x, buttons[id].y);
 }
 
 function isMouseOverButton(id) {
@@ -126,7 +153,14 @@ function resetGame() {
 
 function mouseClicked() {
     if (isMouseOverButton(0)) {
+	console.log("clicked button 0 (reset)");
 	resetGame();
+	return;
+    }
+
+    if (isMouseOverButton(1)) {
+	console.log("clicked button 1 (physics settings)");
+	physicsSettingsOpen = true;
 	return;
     }
 
@@ -162,7 +196,7 @@ function mouseWheel(event) {
 function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
     updateCenter();
-    updateButton(0);
+    updateButtons();
 }
 
 function processGravity(dt) {
@@ -352,7 +386,7 @@ function drawAtoms() {
     }
 }
 
-function drawHud() {
+function drawStatusBar() {
     textSize(16);
     noStroke();
     let scaleStatus = " -- scale = 1:" + scale*10**exponent + " -- ";
@@ -377,33 +411,41 @@ function drawHud() {
     fill(0);
     text(scaleStatus, bar.x, bar.y + scaleBounds.h + padding);
     text(atomStatus, buttons[0].x + buttons[0].w, bar.y + atomBounds.h + padding);
-
-    // button hover effect.
-    let color = "#ff7777";
-    if (isMouseOverButton(0)) {
-	color = "#7777ff";
-    }
-
-    stroke(color);
-    fill(color);
     drawButton(0);
+}
 
-    // draw if game is pauzed
+function drawPaused() {
+    let pauseBounds = textBounds("pauzed", width/2, height);
+    let y = height - pauseBounds.h - 4*padding;
+    let x = width/2 - pauseBounds.w/2;
+
+    fill(255);
+    stroke(255);
+    rect(x, y, pauseBounds.w, padding+pauseBounds.h);
+    circle(x, y+pauseBounds.h/2 + padding/2, pauseBounds.h+padding);
+    circle(x+pauseBounds.w, y+pauseBounds.h/2+padding/2, pauseBounds.h+padding);
+    stroke(0);
+    fill(0);
+    text("pauzed", x, y+pauseBounds.h);
+}
+
+function drawPhysicsSettings() {
+    fill(255);
+    noStroke();
+
+    let button = buttons[1];
+    rect(button.x - padding/2, button.y - button.h, button.w + padding, button.h + padding);
+    circle(button.x - padding/2, button.y - button.h/2 + padding/2, button.h+padding);
+    circle(button.x + button.w + padding/2, button.y - button.h/2 + padding/2, button.h+padding);
+    drawButton(1);
+}
+
+function drawHud() {
+    drawStatusBar();
+    drawPhysicsSettings();
     if (phyicsSettings.pause) {
-	let pauseBounds = textBounds("pauzed", width/2, height);
-	let y = height - pauseBounds.h - 4*padding;
-	let x = width/2 - pauseBounds.w/2;
-
-	fill(255);
-	stroke(255);
-	rect(x, y, pauseBounds.w, padding+pauseBounds.h);
-	circle(x, y+pauseBounds.h/2 + padding/2, pauseBounds.h+padding);
-	circle(x+pauseBounds.w, y+pauseBounds.h/2+padding/2, pauseBounds.h+padding);
-	stroke(0);
-	fill(0);
-	text("pauzed", x, y+pauseBounds.h);
+	drawPaused();
     }
-
 }
 
 function draw() {
