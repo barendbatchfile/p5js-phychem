@@ -15,21 +15,6 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-let atoms = [];
-let current_atom = {
-    name: "H",
-    number: 1,
-    m: 1,
-    x: 0,
-    y: 0,
-    vx: 0,
-    vy: 0,
-    ax: 0,
-    ay: 0,
-    c: "#00ff00",
-    r: 5.3e-11,
-};
-
 let phyicsSettings = {
     timeMultiplier: 1,
     gravityMultiplier: 1e8,
@@ -83,6 +68,124 @@ let phyicsConstents = {
     atomicMass: 1.660538921e-27,
 };
 
+let atomSelector = {
+    size: 0,
+    count: 3,
+    h: 0,
+    w: 0,
+    x: 0,
+    y: 0,
+    current: 0,
+    periodicTable: [
+	{
+	    name: "H",
+	    number: 1,
+	    m: 1,
+	    x: 0,
+	    y: 0,
+	    vx: 0,
+	    vy: 0,
+	    ax: 0,
+	    ay: 0,
+	    c: "#00ff00",
+	    r: 5.3e-11,
+	},
+	{
+	    name: "H",
+	    number: 2,
+	    m: 2,
+	    x: 0,
+	    y: 0,
+	    vx: 0,
+	    vy: 0,
+	    ax: 0,
+	    ay: 0,
+	    c: "#00ff00",
+	    r: 5.3e-11,
+	},
+	{
+	    name: "H",
+	    number: 3,
+	    m: 3,
+	    x: 0,
+	    y: 0,
+	    vx: 0,
+	    vy: 0,
+	    ax: 0,
+	    ay: 0,
+	    c: "#00ff00",
+	    r: 5.3e-11,
+	},
+	{
+	    name: "O",
+	    number: 15,
+	    m: 15,
+	    x: 0,
+	    y: 0,
+	    vx: 0,
+	    vy: 0,
+	    ax: 0,
+	    ay: 0,
+	    c: "#5555ff",
+	    r: 5.3e-11,
+	},
+	{
+	    name: "O",
+	    number: 16,
+	    m: 16,
+	    x: 0,
+	    y: 0,
+	    vx: 0,
+	    vy: 0,
+	    ax: 0,
+	    ay: 0,
+	    c: "#5555ff",
+	    r: 5.3e-11,
+	},
+	{
+	    name: "O",
+	    number: 17,
+	    m: 17,
+	    x: 0,
+	    y: 0,
+	    vx: 0,
+	    vy: 0,
+	    ax: 0,
+	    ay: 0,
+	    c: "#5555ff",
+	    r: 5.3e-11,
+	},
+	{
+	    name: "O",
+	    number: 18,
+	    m: 18,
+	    x: 0,
+	    y: 0,
+	    vx: 0,
+	    vy: 0,
+	    ax: 0,
+	    ay: 0,
+	    c: "#5555ff",
+	    r: 5.3e-11,
+	},
+	{
+	    name: "O",
+	    number: 19,
+	    m: 19,
+	    x: 0,
+	    y: 0,
+	    vx: 0,
+	    vy: 0,
+	    ax: 0,
+	    ay: 0,
+	    c: "#5555ff",
+	    r: 5.3e-11,
+	},
+    ],
+};
+
+let atoms = [];
+let atomSelectorOpen = false;
 let showWelcome = true;
 let checkBoxSize = 0;
 let physicsSettingsOpen = false;
@@ -128,6 +231,13 @@ let buttons = [
 	w: 0,
 	h: 0,
     },
+    {
+	label: "Atom selector",
+	x: 0,
+	y: 0,
+	w: 0,
+	h: 0,
+    },
 ];
 
 function updateButton(id) {
@@ -143,6 +253,14 @@ function updateButton(id) {
 	buttons[id].h = bounds.h;
 	buttons[id].y = 2*padding + buttons[id].h;
 	buttons[id].x = padding + buttons[id].h;
+    } else if (id === 3) {
+	buttons[id].w = bounds.w;
+	buttons[id].h = bounds.h + padding;
+	buttons[id].y = 2*padding + buttons[id].h;
+	buttons[id].x = width - 3*padding - buttons[id].w - buttons[id].h;
+
+	bounds = textBounds("WW-WWW", 0, 0);
+	atomSelector.size = max(bounds.h, bounds.w);
     }
 }
 
@@ -232,6 +350,46 @@ function mouseClicked() {
 	return;
     }
 
+    if (mouseX > atomSelector.x &&
+	mouseX < atomSelector.x + atomSelector.w &&
+	mouseY > atomSelector.y &&
+	mouseY < atomSelector.y + atomSelector.h) {
+	if (isMouseOverButton(3)) {
+	    console.log("clicked button 3 (atom selector)");
+	    atomSelectorOpen = !atomSelectorOpen;
+	    return;
+	}
+
+	let x = atomSelector.x + padding;
+	let y = atomSelector.y + 3 * padding + lineSize;
+	stroke(0);
+	for (let i = 0; i < atomSelector.periodicTable.length; i++) {
+	    if (mouseX > x &&
+		mouseX < x + atomSelector.size &&
+		mouseY > y &&
+		mouseY < y + atomSelector.size) {
+		atomSelector.current = i;
+		atomSelectorOpen = false;
+		return;
+	    }
+
+	    let atom = atomSelector.periodicTable[i];
+	    let bounds = textBounds(atom.name + "-" + atom.number, 0, 0);
+	    square(x, y, atomSelector.size);
+
+	    if ((i+1)% atomSelector.count === 0) {
+		y += atomSelector.size;
+		x = atomSelector.x + padding;
+	    } else {
+		x += atomSelector.size;
+	    }
+
+
+	}
+
+	return;
+    }
+
     if (mouseX > bar.x &&
 	mouseX < bar.x + bar.w &&
 	mouseY > bar.y &&
@@ -257,7 +415,7 @@ function mouseClicked() {
 
     if (dragging) { return; }
 
-    let atom = Object.create(current_atom);
+    let atom = Object.create(atomSelector.periodicTable[atomSelector.current]);
     atom.x = (mouseX - centerX) * (scale*10**exponent) / stepSize;
     atom.y = (mouseY - centerY) * (scale*10**exponent) / stepSize;
     atoms.push(atom);
@@ -607,9 +765,66 @@ function drawPhysicsSettings() {
     drawButton(1);
 }
 
+function drawAtomSelectorOpen() {
+    fill(255);
+    noStroke();
+
+    let button = buttons[3];
+    atomSelector.h = button.h + 4*padding + lineSize + Math.ceil(atomSelector.periodicTable.length/atomSelector.count) * atomSelector.size;
+    atomSelector.w = max(button.w + button.h, 3*atomSelector.size) + 2*padding;
+    atomSelector.x = width - atomSelector.w - 2*padding - button.h/2;
+    atomSelector.y = button.y - button.h;
+    rect(atomSelector.x, atomSelector.y, atomSelector.w, atomSelector.h, 10);
+    fill(127);
+    rect(atomSelector.x + padding/2, button.y + 2 * padding - lineSize/2, atomSelector.count*atomSelector.size, lineSize);
+
+    let x = atomSelector.x + padding;
+    let y = button.y + 3 * padding + lineSize;
+    stroke(0);
+    for (let i = 0; i < atomSelector.periodicTable.length; i++) {
+	let atom = atomSelector.periodicTable[i];
+	let txt = atom.name + "-" + atom.number;
+	let bounds = textBounds(txt, 0, 0);
+	fill(atom.c);
+	square(x, y, atomSelector.size);
+	fill(0);
+	text(txt, x + (atomSelector.size - bounds.w)/2, y + atomSelector.size -(atomSelector.size - bounds.h)/2);
+
+	if ((i+1)% atomSelector.count === 0) {
+	    y += atomSelector.size;
+	    x = atomSelector.x + padding;
+	} else {
+	    x += atomSelector.size;
+	}
+    }
+
+    drawButton(3);
+}
+
+function drawAtomSelector() {
+    fill(255);
+    noStroke();
+
+    let button = buttons[3];
+    if (atomSelectorOpen)  {
+	drawAtomSelectorOpen();
+    } else {
+	atomSelector.h = button.h + padding;
+	atomSelector.w = button.w + button.h + padding;
+	atomSelector.x = button.x - padding - button.h/2;
+	atomSelector.y = button.y - button.h;
+	rect(button.x - padding/2, button.y - button.h, button.w + padding, atomSelector.h);
+	circle(button.x - padding/2, button.y - button.h/2 + padding/2, button.h+padding);
+	circle(button.x + button.w + padding/2, button.y - button.h/2 + padding/2, button.h+padding);
+    }
+
+    drawButton(3);
+}
+
 function drawHud() {
     drawStatusBar();
     drawPhysicsSettings();
+    drawAtomSelector();
     drawPaused();
 }
 
@@ -624,7 +839,8 @@ function drawWelcome() {
 
     UI:
     In the top middle part of your screen there is a bar with your current scale/zoom level compared to when you just launched the simulation. A reset button which reset the simulation, your cursor position, and your zoom, but not your settings. And a count of the total number of atoms in the simulation.
-    On the right side the is a button which opens a menu of settings for the physics engine.
+    On the left side the is a button which opens a menu of settings for the physics engine.
+    On the right side the is a button which opens a menu for selecting different atoms.
 In the bottom middle part of your screen there is a pause/resume button with pauses or resmuses the simuation.
 
     Good things to know:
