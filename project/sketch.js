@@ -185,6 +185,8 @@ let atomSelector = {
 };
 
 let atoms = [];
+let min_atom_diamater = 5;
+let max_atom_diamater = 0;
 let atomSelectorOpen = false;
 let showWelcome = true;
 let checkBoxSize = 0;
@@ -282,6 +284,7 @@ function setup() {
     updateCenter();
     updateButtons();
     textSize(16);
+    max_atom_diamater = 2*max(width, height);
     let bounds = textBounds("W", 0, 0);
     checkBoxSize = 1.1*max(bounds.h, bounds.w);
 }
@@ -414,7 +417,6 @@ function mouseClicked() {
     }
 
     if (dragging) { return; }
-
     let atom = Object.create(atomSelector.periodicTable[atomSelector.current]);
     atom.x = (mouseX - centerX) * (scale*10**exponent) / stepSize;
     atom.y = (mouseY - centerY) * (scale*10**exponent) / stepSize;
@@ -425,7 +427,7 @@ function mouseWheel(event) {
     let oldPixelsPerUnit = stepSize / (scale*10**exponent);
 
     if (exponent < 3 && event.delta > 0) { scale *= 2};
-    if (exponent > -20 && event.delta < 0) { scale /= 2};
+    if (exponent > -12 && event.delta < 0) { scale /= 2};
     if (scale <= 0) { scale = 0.1; }
     if (scale >= 10) { scale /= 10; exponent += 1; }
     if (scale < 0.1) { scale *= 10; exponent -= 1; }
@@ -444,6 +446,7 @@ function mouseWheel(event) {
 
 function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
+    max_atom_diamater = 2*max(width, height),
     updateCenter();
     updateButtons();
 }
@@ -452,6 +455,8 @@ function processGravity(dt) {
     for (let i = 0; i < atoms.length; i++) {
 	let atomA = atoms[i];
 
+	atomA.ax = 0;
+	atomA.ay = 0;
 	for (let j = 0; j < atoms.length; j++) {
 	    if (i === j) { continue; }
 	    let atomB = atoms[j];
@@ -470,8 +475,8 @@ function processGravity(dt) {
 	    if (r === 0) { continue; }
 
 	    let a = phyicsConstents.gravity * massB / (r**2) * phyicsSettings.gravityMultiplier;
-	    atomA.ax = a * dx / r;
-	    atomA.ay = a * dy / r;
+	    atomA.ax += a * dx / r;
+	    atomA.ay += a * dy / r;
 	}
     }
 }
@@ -517,8 +522,6 @@ function processPhyics() {
 }
 
 function getUnit() {
-    if (exponent > -21 && exponent <= -18) { return "am"; }
-    if (exponent > -18 && exponent <= -15) { return "fm"; }
     if (exponent > -15 && exponent <= -12) { return "pm"; }
     if (exponent > -12 && exponent <= -9) { return "nm"; }
     if (exponent > -9 && exponent <= -6) { return "μm"; }
@@ -612,7 +615,14 @@ function drawAtoms() {
 	let atom = atoms[i];
 	let x = centerX + atom.x / (scale*10**exponent) * stepSize;
 	let y = centerY + atom.y / (scale*10**exponent) * stepSize;
-	let d = max(5, 2 * atom.r * stepSize / (scale * 10 ** exponent));
+	let d = min(max_atom_diamater, max(min_atom_diamater, 2 * atom.r * stepSize / (scale * 10 ** exponent)));
+
+	if (x + d/2 < 0 ||
+	    x - d/2 > width ||
+	    y + d/2 < 0 ||
+	    y - d/2 > height) {
+	    continue;
+	}
 
 	fill(atom.c);
 	circle(x, y, d);
