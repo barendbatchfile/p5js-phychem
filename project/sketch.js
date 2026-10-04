@@ -614,7 +614,7 @@ function drawWelcome() {
     textSize(16);
     noStroke();
     let welcomeText = `Welcome to phychem-ulator, a physics and chemistry simulator
-    Useage:
+    Usage:
     Move around by grabbing the coordinate plane by dragging it while pressing your left mouse button, by using the WASD-keys, or by using the arrow-keys.
     Place atoms by clicking with your left mouse button.
     Scroll up/down to zoom in/out.

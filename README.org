@@ -3,4 +3,4 @@
 
 Phychem is located in the project directory.
 Open index.html in a web browser to run phychem.
-In further instructions are in the welcome message.
+Further instructions are in the welcome message.
