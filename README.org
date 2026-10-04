@@ -1,19 +1,6 @@
 #+title: Phychem-ulator.
 #+subtitle: A physics and chemistry simulator.
+
 Phychem is located in the project directory.
-* Instructions.
-  Open index.html in a web browser to run phychem.
-  You can move around using the arrow keys, WASD or grabbing the plane with your cursor.
-  Atoms can be placed simply by left clicking.
-  Zooming can be done by simply scrolling up or down.
-
-  #+begin_quote
-  Caution: the scale is realistic, so you want to zoom in about 10'000'000'000 times to be able to really see the atom. Also, when you are zooming in 10'000'000'000 times or more you may not end up where you expect since your accuracy needs to be on a subsubpixel level.
-  #+end_quote
-
-  #+begin_quote
-  Tip: you can place a atom, keep your mouse still, and scroll to zoom in and if done correctly you'll end up perfectly at your atom.
-  #+end_quote
-
-  The simulation may be paused by pressing the 'p'-key. There will be a indicator at the bottom of your screen to show that you are paused.
-  Pressing the 'r'-key or the "Reset simulator"-button will completely reset the simulation, but will keep any custom settings.
+Open index.html in a web browser to run phychem.
+In further instructions are in the welcome message.

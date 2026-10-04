@@ -32,9 +32,9 @@ let phyicsSettings = {
     timeMultiplier: 1,
     gravityMultiplier: 1e8,
     softeningConst: 2,
-    pause: false,
 };
 
+let paused = false;
 let phyicsOptions = {
     h: 0,
     w: 0,
@@ -107,13 +107,20 @@ let bar = {
 let buttons = [
     {
 	label: "Reset simulator",
-	x: -100,
-	y: -100,
+	x: 0,
+	y: 0,
 	w: 0,
 	h: 0,
     },
     {
-	label: "physics settings",
+	label: "Physics settings",
+	x: 0,
+	y: 0,
+	w: 0,
+	h: 0,
+    },
+    {
+	label: "Pause simulation",
 	x: 0,
 	y: 0,
 	w: 0,
@@ -233,6 +240,16 @@ function mouseClicked() {
 	    return;
 	}
 
+	return;
+    }
+
+    if (mouseX > buttons[2].x &&
+	mouseX < buttons[2].x + buttons[2].w &&
+	mouseY < buttons[2].y &&
+	mouseY > buttons[2].y - buttons[2].h) {
+
+	console.log("clicked button 2 (pause/unpause)");
+	paused = !paused;
 	return;
     }
 
@@ -369,7 +386,7 @@ function keyTyped() {
     }
 
     if (key === 'p') {
-	phyicsSettings.pause = !phyicsSettings.pause;
+	paused = !paused;
     }
 }
 
@@ -491,18 +508,27 @@ function drawStatusBar() {
 }
 
 function drawPaused() {
-    let pauseBounds = textBounds("pauzed", width/2, height);
-    let y = height - pauseBounds.h - 4*padding;
-    let x = width/2 - pauseBounds.w/2;
+    let button = buttons[2];
+    if (paused) {
+	button.label = "Resume simulation";
+    } else {
+	button.label = "Pause simulation";
+    }
+
+    let bounds = textBounds(button.label, width/2, height);
+    button.y = height - bounds.h - 3.5*padding;
+    button.x = width/2 - bounds.w/2 + padding/2;
+    button.w = bounds.w + padding;
+    button.h = bounds.h + padding;
 
     fill(255);
     stroke(255);
-    rect(x, y, pauseBounds.w, padding+pauseBounds.h);
-    circle(x, y+pauseBounds.h/2 + padding/2, pauseBounds.h+padding);
-    circle(x+pauseBounds.w, y+pauseBounds.h/2+padding/2, pauseBounds.h+padding);
+    rect(button.x - padding/2, button.y - button.h + padding/2, button.w, button.h);
+    circle(button.x - padding/2, button.y - button.h/2 + padding/2, button.h);
+    circle(button.x + button.w, button.y - button.h/2 + padding/2, button.h);
     stroke(0);
     fill(0);
-    text("pauzed", x, y+pauseBounds.h);
+    drawButton(2);
 }
 
 function drawPhysicsOptions() {
@@ -581,9 +607,7 @@ function drawPhysicsSettings() {
 function drawHud() {
     drawStatusBar();
     drawPhysicsSettings();
-    if (phyicsSettings.pause) {
-	drawPaused();
-    }
+    drawPaused();
 }
 
 function drawWelcome() {
@@ -598,6 +622,7 @@ function drawWelcome() {
     UI:
     In the top middle part of your screen there is a bar with your current scale/zoom level compared to when you just launched the simulation. A reset button which reset the simulation, your cursor position, and your zoom, but not your settings. And a count of the total number of atoms in the simulation.
     On the right side the is a button which opens a menu of settings for the physics engine.
+In the bottom middle part of your screen there is a pause/resume button with pauses or resmuses the simuation.
 
     Good things to know:
     The Simulation aims to be realistic, atoms are always drawn but at least 5 pixels in size, but are realistic in size. Thus you'll need to zoom in alot (10'000'000'000 times) to be able to really seem them. On that note zooming in can be kind of difficult when every thing is so small, I suggest you place an atom, keep your mouse still, and then zoom in until the you can see the atom. This way you'll end up with your cursor at the atom. Also gravity is made 100'000'000 times stronger so you'll be able to actually see stuff moving in a timely manner.
@@ -619,7 +644,7 @@ function draw() {
     background(172);
     fill(128, 255, 128);
     handleKeys();
-    if (!phyicsSettings.pause) { processPhyics(); }
+    if (!paused) { processPhyics(); }
     drawCoordinatePlane();
     drawAtoms();
     drawHud();
