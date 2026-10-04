@@ -24,6 +24,8 @@ let current_atom = {
     y: 0,
     vx: 0,
     vy: 0,
+    ax: 0,
+    ay: 0,
     c: "#00ff00",
     r: 5.3e-11,
 };
@@ -310,11 +312,8 @@ function processGravity(dt) {
 	    if (r === 0) { continue; }
 
 	    let a = phyicsConstents.gravity * massB / (r**2) * phyicsSettings.gravityMultiplier;
-	    let ax = a * dx / r;
-	    let ay = a * dy / r;
-
-	    atomA.vx += ax * dt;
-	    atomA.vy += ay * dt;
+	    atomA.ax = a * dx / r;
+	    atomA.ay = a * dy / r;
 	}
     }
 }
@@ -335,6 +334,7 @@ function processPhyics() {
 	processGravity(dt);
     }
 
+    //bounce
     if (phyicsOptions.checkBoxes[1].value) {
 	for (let i = 0; i < atoms.length; i++) {
 	    let atomA = atoms[i];
@@ -347,8 +347,11 @@ function processPhyics() {
 	}
     }
 
+    // movement
     if (phyicsOptions.checkBoxes[2].value) {
 	for (let i = 0; i < atoms.length; i++) {
+	    atoms[i].vx += atoms[i].ax * dt;
+	    atoms[i].vy += atoms[i].ay * dt;
 	    atoms[i].x += atoms[i].vx * dt;
 	    atoms[i].y += atoms[i].vy * dt;
 	}
