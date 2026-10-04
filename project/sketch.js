@@ -211,8 +211,8 @@ function mouseClicked() {
 
 	for (let i = 0; i < phyicsOptions.checkBoxes.length; i++) {
 	    let checkBox = phyicsOptions.checkBoxes[i];
-	    if (mouseX > checkBox.x &&
-		mouseX < checkBox.x + checkBox.w &&
+	    if (mouseX > phyicsOptions.x &&
+		mouseX < phyicsOptions.x + phyicsOptions.w &&
 		mouseY > checkBox.y &&
 		mouseY < checkBox.y + checkBox.h) {
 		checkBox.value = !checkBox.value;
@@ -591,7 +591,7 @@ function drawWelcome() {
     noStroke();
     let welcomeText = `Welcome to phychem-ulator, a physics and chemistry simulator
     Useage:
-    Move around by grabbing the plane with your left mouse button, by using the WASD-keys, or by using the arrow-keys.
+    Move around by grabbing the coordinate plane by dragging it while pressing your left mouse button, by using the WASD-keys, or by using the arrow-keys.
     Place atoms by clicking with your left mouse button.
     Scroll up/down to zoom in/out.
 
@@ -600,9 +600,9 @@ function drawWelcome() {
     On the right side the is a button which opens a menu of settings for the physics engine.
 
     Good things to know:
-    The Simulation aims to be realistic, atoms are always drawn but at least 5 pixels in size, but are realistic in size. Thus you'll need to zoom in alot (10'000'000'000 times) to be able to really seem them. On that note zooming in can be kind of difficult when every thing is so small, I suggest you place an atom, keep your mouse still, and then zoom in until the you can see the atom. This way you'll and up with your cursor at the atom. Also gravity is made 100'000'000 times stronger so you'll be able to actually see stuff moving.
+    The Simulation aims to be realistic, atoms are always drawn but at least 5 pixels in size, but are realistic in size. Thus you'll need to zoom in alot (10'000'000'000 times) to be able to really seem them. On that note zooming in can be kind of difficult when every thing is so small, I suggest you place an atom, keep your mouse still, and then zoom in until the you can see the atom. This way you'll end up with your cursor at the atom. Also gravity is made 100'000'000 times stronger so you'll be able to actually see stuff moving in a timely manner.
 
-    Clicking will close this screen.`
+    Clicking anywhere will close this screen.`
     let welcomeWidth = width/2 + padding;
     let bounds = textBounds(welcomeText, width/2, 0, welcomeWidth - padding);
     let welcomeHeight = bounds.h + 2*padding;
