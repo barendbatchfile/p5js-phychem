@@ -77,6 +77,7 @@ let phyicsConstents = {
     atomicMass: 1.660538921e-27,
 };
 
+let showWelcome = true;
 let checkBoxSize = 0;
 let physicsSettingsOpen = false;
 let lineSize = 2;
@@ -189,6 +190,11 @@ function resetGame() {
 }
 
 function mouseClicked() {
+    if (showWelcome) {
+	showWelcome = false;
+	return;
+    }
+
     for (let i = 0; i < phyicsOptions.checkBoxes.length; i++) {
 	let checkBox = phyicsOptions.checkBoxes[i];
 	if (mouseX > checkBox.x &&
@@ -330,6 +336,7 @@ function getUnit() {
 }
 
 function mouseDragged() {
+    if (showWelcome) { return; }
     cursor.x += mouseX - pmouseX;
     cursor.y += mouseY - pmouseY;
     centerY = offset.y + cursor.y;
@@ -338,6 +345,7 @@ function mouseDragged() {
 }
 
 function keyTyped() {
+    if (showWelcome) { return; }
     if (key === 'r') {
 	resetGame();
     }
@@ -348,6 +356,8 @@ function keyTyped() {
 }
 
 function handleKeys() {
+    if (keyIsDown(RETURN)) showWelcome = false;
+    if (showWelcome) { return; }
     if (keyIsDown(LEFT_ARROW) || keyIsDown(65)) {
 	cursor.x += cursorSpeed;
 	centerX = offset.x + cursor.x;
@@ -552,6 +562,35 @@ function drawHud() {
     }
 }
 
+function drawWelcome() {
+    textSize(16);
+    noStroke();
+    let welcomeText = `Welcome to phychem-ulator, a physics and chemistry simulator
+    Useage:
+    Move around by grabbing the plane with your left mouse button, by using the WASD-keys, or by using the arrow-keys.
+    Place atoms by clicking with your left mouse button.
+    Scroll up/down to zoom in/out.
+
+    UI:
+    In the top middle part of your screen there is a bar with your current scale/zoom level compared to when you just launched the simulation. A reset button which reset the simulation, your cursor position, and your zoom, but not your settings. And a count of the total number of atoms in the simulation.
+    On the right side the is a button which opens a menu of settings for the physics engine.
+
+    Good things to know:
+    The Simulation aims to be realistic, atoms are always drawn but at least 5 pixels in size, but are realistic in size. Thus you'll need to zoom in alot (10'000'000'000 times) to be able to really seem them. On that note zooming in can be kind of difficult when every thing is so small, I suggest you place an atom, keep your mouse still, and then zoom in until the you can see the atom. This way you'll and up with your cursor at the atom. Also gravity is made 100'000'000 times stronger so you'll be able to actually see stuff moving.
+
+    Clicking will close this screen.`
+    let welcomeWidth = width/2 + padding;
+    let bounds = textBounds(welcomeText, width/2, 0, welcomeWidth - padding);
+    let welcomeHeight = bounds.h + 2*padding;
+
+    fill(255);
+    rect(width/2-welcomeWidth/2, height/2-welcomeHeight/2, welcomeWidth, welcomeHeight, 10);
+
+    fill(0);
+    stroke(0);
+    text(welcomeText, width/2-welcomeWidth/2+padding/2, height/2 - welcomeHeight/2+padding, welcomeWidth - padding);
+}
+
 function draw() {
     background(172);
     fill(128, 255, 128);
@@ -560,4 +599,5 @@ function draw() {
     drawCoordinatePlane();
     drawAtoms();
     drawHud();
+    if (showWelcome) { drawWelcome(); }
 }
