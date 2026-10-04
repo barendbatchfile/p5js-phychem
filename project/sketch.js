@@ -36,6 +36,10 @@ let phyicsSettings = {
 };
 
 let phyicsOptions = {
+    h: 0,
+    w: 0,
+    x: 0,
+    y: 0,
     checkBoxes: [
 	{
 	    label: "gravity",
@@ -195,26 +199,40 @@ function mouseClicked() {
 	return;
     }
 
-    for (let i = 0; i < phyicsOptions.checkBoxes.length; i++) {
-	let checkBox = phyicsOptions.checkBoxes[i];
-	if (mouseX > checkBox.x &&
-	    mouseX < checkBox.x + checkBox.w &&
-	    mouseY > checkBox.y &&
-	    mouseY < checkBox.y + checkBox.h) {
-	    checkBox.value = !checkBox.value;
+    if (mouseX > phyicsOptions.x &&
+	mouseX < phyicsOptions.x + phyicsOptions.w &&
+	mouseY > phyicsOptions.y &&
+	mouseY < phyicsOptions.y + phyicsOptions.h) {
+	if (isMouseOverButton(1)) {
+	    console.log("clicked button 1 (physics settings)");
+	    physicsSettingsOpen = !physicsSettingsOpen;
 	    return;
 	}
-    }
 
-    if (isMouseOverButton(0)) {
-	console.log("clicked button 0 (reset)");
-	resetGame();
+	for (let i = 0; i < phyicsOptions.checkBoxes.length; i++) {
+	    let checkBox = phyicsOptions.checkBoxes[i];
+	    if (mouseX > checkBox.x &&
+		mouseX < checkBox.x + checkBox.w &&
+		mouseY > checkBox.y &&
+		mouseY < checkBox.y + checkBox.h) {
+		checkBox.value = !checkBox.value;
+		return;
+	    }
+	}
+
 	return;
     }
 
-    if (isMouseOverButton(1)) {
-	console.log("clicked button 1 (physics settings)");
-	physicsSettingsOpen = !physicsSettingsOpen;
+    if (mouseX > bar.x &&
+	mouseX < bar.x + bar.w &&
+	mouseY > bar.y &&
+	mouseY < bar.y + bar.h) {
+	if (isMouseOverButton(0)) {
+	    console.log("clicked button 0 (reset)");
+	    resetGame();
+	    return;
+	}
+
 	return;
     }
 
@@ -489,23 +507,25 @@ function drawPaused() {
 
 function drawPhysicsOptions() {
     let button = buttons[1];
-    let optionsHeight = padding + button.h + padding + lineSize/2;
-    let optionsWidth = 0;
+    phyicsOptions.h = padding + button.h + padding + lineSize/2;
+    phyicsOptions.w = 0;
     for (let i = 0; i < phyicsOptions.checkBoxes.length; i++) {
 	let bounds = textBounds(phyicsOptions.checkBoxes[i].label, 0, 0);
-	optionsWidth = max(optionsWidth, bounds.w + 1.5 * padding + checkBoxSize);
+	phyicsOptions.w = max(phyicsOptions.w, bounds.w + 1.5 * padding + checkBoxSize);
     }
 
-    optionsWidth = max(optionsWidth, 1.5 * padding + button.h/2 + button.w) + 2 * padding;
+    phyicsOptions.w = max(phyicsOptions.w, 1.5 * padding + button.h/2 + button.w) + 2 * padding;
     for (let i = 0; i < phyicsOptions.checkBoxes.length; i++) {
 	let bounds = textBounds(phyicsOptions.checkBoxes[i].label, 0, 0);
-	optionsHeight += max(bounds.h, checkBoxSize) + padding;
+	phyicsOptions.h += max(bounds.h, checkBoxSize) + padding;
     }
 
-    optionsHeight += padding;
+    phyicsOptions.h += padding;
+    phyicsOptions.x = button.x - padding - button.h/2;
+    phyicsOptions.y = button.y - button.h;
 
     fill(255);
-    rect(button.x - padding - button.h/2, button.y - button.h, optionsWidth, optionsHeight, 10);
+    rect(phyicsOptions.x, phyicsOptions.y, phyicsOptions.w, phyicsOptions.h, 10);
     fill(127);
     rect(button.x, button.y + 2 * padding - lineSize/2, button.w, lineSize);
 
@@ -546,6 +566,10 @@ function drawPhysicsSettings() {
     if (physicsSettingsOpen)  {
 	drawPhysicsOptions();
     } else {
+	phyicsOptions.h = button.h + padding;
+	phyicsOptions.w = button.w + button.h + padding;
+	phyicsOptions.x = button.x - padding - button.h/2;
+	phyicsOptions.y = button.y - button.h;
 	rect(button.x - padding/2, button.y - button.h, button.w + padding, button.h + padding);
 	circle(button.x - padding/2, button.y - button.h/2 + padding/2, button.h+padding);
 	circle(button.x + button.w + padding/2, button.y - button.h/2 + padding/2, button.h+padding);
