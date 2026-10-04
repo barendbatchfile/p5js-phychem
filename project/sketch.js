@@ -68,6 +68,27 @@ let phyicsConstents = {
     atomicMass: 1.660538921e-27,
 };
 
+let covalentRadiiPm = {
+    1: 31,   // H
+    2: 28,   // He
+    3: 128,  // Li
+    4: 96,   // Be
+    5: 84,   // B
+    6: 76,   // C
+    7: 71,   // N
+    8: 66,   // O
+    9: 57,   // F
+    10: 58,  // Ne
+    11: 166, // Na
+    12: 141, // Mg
+    13: 121, // Al
+    14: 111, // Si
+    15: 107, // P
+    16: 105, // S
+    17: 102, // Cl
+    18: 106, // Ar
+};
+
 let atomSelector = {
     size: 0,
     count: 3,
@@ -78,9 +99,9 @@ let atomSelector = {
     current: 0,
     periodicTable: [
 	{
-	    name: "H",
-	    number: 1,
-	    m: 1,
+	    symbol: "H",
+	    Z: 1,
+	    A: 1,
 	    x: 0,
 	    y: 0,
 	    vx: 0,
@@ -88,12 +109,12 @@ let atomSelector = {
 	    ax: 0,
 	    ay: 0,
 	    c: "#00ff00",
-	    r: 5.3e-11,
+	    r: 0,
 	},
 	{
-	    name: "H",
-	    number: 2,
-	    m: 2,
+	    symbol: "H",
+	    Z: 1,
+	    A: 2,
 	    x: 0,
 	    y: 0,
 	    vx: 0,
@@ -101,12 +122,12 @@ let atomSelector = {
 	    ax: 0,
 	    ay: 0,
 	    c: "#00ff00",
-	    r: 5.3e-11,
+	    r: 0,
 	},
 	{
-	    name: "H",
-	    number: 3,
-	    m: 3,
+	    symbol: "H",
+	    Z: 1,
+	    A: 3,
 	    x: 0,
 	    y: 0,
 	    vx: 0,
@@ -114,12 +135,12 @@ let atomSelector = {
 	    ax: 0,
 	    ay: 0,
 	    c: "#00ff00",
-	    r: 5.3e-11,
+	    r: 0,
 	},
 	{
-	    name: "O",
-	    number: 15,
-	    m: 15,
+	    symbol: "O",
+	    Z: 8,
+	    A: 15,
 	    x: 0,
 	    y: 0,
 	    vx: 0,
@@ -127,12 +148,12 @@ let atomSelector = {
 	    ax: 0,
 	    ay: 0,
 	    c: "#5555ff",
-	    r: 5.3e-11,
+	    r: 0,
 	},
 	{
-	    name: "O",
-	    number: 16,
-	    m: 16,
+	    symbol: "O",
+	    Z: 8,
+	    A: 16,
 	    x: 0,
 	    y: 0,
 	    vx: 0,
@@ -140,12 +161,12 @@ let atomSelector = {
 	    ax: 0,
 	    ay: 0,
 	    c: "#5555ff",
-	    r: 5.3e-11,
+	    r: 0,
 	},
 	{
-	    name: "O",
-	    number: 17,
-	    m: 17,
+	    symbol: "O",
+	    Z: 8,
+	    A: 17,
 	    x: 0,
 	    y: 0,
 	    vx: 0,
@@ -153,12 +174,12 @@ let atomSelector = {
 	    ax: 0,
 	    ay: 0,
 	    c: "#5555ff",
-	    r: 5.3e-11,
+	    r: 0,
 	},
 	{
-	    name: "O",
-	    number: 18,
-	    m: 18,
+	    symbol: "O",
+	    Z: 8,
+	    A: 18,
 	    x: 0,
 	    y: 0,
 	    vx: 0,
@@ -166,12 +187,12 @@ let atomSelector = {
 	    ax: 0,
 	    ay: 0,
 	    c: "#5555ff",
-	    r: 5.3e-11,
+	    r: 0,
 	},
 	{
-	    name: "O",
-	    number: 19,
-	    m: 19,
+	    symbol: "O",
+	    Z: 8,
+	    A: 19,
 	    x: 0,
 	    y: 0,
 	    vx: 0,
@@ -179,7 +200,7 @@ let atomSelector = {
 	    ax: 0,
 	    ay: 0,
 	    c: "#5555ff",
-	    r: 5.3e-11,
+	    r: 0,
 	},
     ],
 };
@@ -377,7 +398,7 @@ function mouseClicked() {
 	    }
 
 	    let atom = atomSelector.periodicTable[i];
-	    let bounds = textBounds(atom.name + "-" + atom.number, 0, 0);
+	    let bounds = textBounds(atom.symbol + "-" + atom.A, 0, 0);
 	    square(x, y, atomSelector.size);
 
 	    if ((i+1)% atomSelector.count === 0) {
@@ -386,8 +407,6 @@ function mouseClicked() {
 	    } else {
 		x += atomSelector.size;
 	    }
-
-
 	}
 
 	return;
@@ -417,7 +436,15 @@ function mouseClicked() {
     }
 
     if (dragging) { return; }
+
     let atom = Object.create(atomSelector.periodicTable[atomSelector.current]);
+    let radius = atomRadius[atom.Z];
+    if (radius === undefined) {
+	atom.r = 100e-12;
+    } else {
+	atom.r = radius * 1e-12;
+    }
+
     atom.x = (mouseX - centerX) * (scale*10**exponent) / stepSize;
     atom.y = (mouseY - centerY) * (scale*10**exponent) / stepSize;
     atoms.push(atom);
@@ -460,7 +487,7 @@ function processGravity(dt) {
 	for (let j = 0; j < atoms.length; j++) {
 	    if (i === j) { continue; }
 	    let atomB = atoms[j];
-	    let massB = atomB.m * phyicsConstents.atomicMass; // convert mass in u to kg.
+	    let massB = atomB.A * phyicsConstents.atomicMass; // convert mass in u to kg.
 
 	    let dx = atomB.x - atomA.x;
 	    let dy = atomB.y - atomA.y;
@@ -626,7 +653,7 @@ function drawAtoms() {
 
 	fill(atom.c);
 	circle(x, y, d);
-	let name = atom.name + "-" + atom.number;
+	let name = atom.symbol + "-" + atom.A;
 	let size = 160;
 	while (true) {
 	    textSize(size);
@@ -793,7 +820,7 @@ function drawAtomSelectorOpen() {
     stroke(0);
     for (let i = 0; i < atomSelector.periodicTable.length; i++) {
 	let atom = atomSelector.periodicTable[i];
-	let txt = atom.name + "-" + atom.number;
+	let txt = atom.symbol + "-" + atom.A;
 	let bounds = textBounds(txt, 0, 0);
 	fill(atom.c);
 	square(x, y, atomSelector.size);
