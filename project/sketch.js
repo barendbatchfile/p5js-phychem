@@ -341,7 +341,6 @@ function resetGame() {
 
     exponent = 0;
     scale = 1;
-    stepSize = markDist / scale;
     atoms = [];
 }
 
@@ -459,7 +458,6 @@ function mouseWheel(event) {
     if (scale <= 0) { scale = 0.1; }
     if (scale >= 10) { scale /= 10; exponent += 1; }
     if (scale < 0.1) { scale *= 10; exponent -= 1; }
-    stepSize = markDist / scale;
 
     let newPixelsPerUnit = stepSize / (scale*10**exponent);
     let zoomRatio = newPixelsPerUnit / oldPixelsPerUnit;
@@ -474,7 +472,7 @@ function mouseWheel(event) {
 
 function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
-    max_atom_diamater = 2*max(width, height);
+    maxAtomDiamater = 2*max(width, height);
     updateCenter();
     updateButtons();
 }
@@ -674,11 +672,11 @@ function drawAtoms() {
 	    textSize(size);
 	    let bounds = textBounds(name, x, y);
 	    let txtR = sqrt(bounds.w*bounds.w + bounds.h*bounds.h);
-	    if (txtR > d) {
+	    if (txtR > d * 0.8) {
 		size -= 1;
 	    }
 
-	    if (size <= 0 || txtR <= d) {
+	    if (size <= 0 || txtR <= d * 0.8) {
 		break;
 	    }
 	}
@@ -695,16 +693,16 @@ function drawAtoms() {
 function drawStatusBar() {
     textSize(16);
     noStroke();
-    let scaleStatus = " -- scale = 1:" + scale*10**exponent + " -- ";
-    let atomStatus = " -- atoms = " + atoms.length + " -- ";
+    let scaleStatus = "scale = 1:" + scale*10**exponent;
+    let atomStatus = "atoms = " + atoms.length;
 
     let scaleBounds = textBounds(scaleStatus, width/2, 0);
     let atomBounds = textBounds(atomStatus, width/2, 0);
 
     // recompute new bar.
     bar.h = buttons[0].h + 2*padding;
-    bar.w = buttons[0].w + scaleBounds.w + atomBounds.w + 2*padding;
-    bar.x = buttons[0].x - scaleBounds.w;
+    bar.w = buttons[0].w*1.2 + scaleBounds.w*1.2 + atomBounds.w*1.2 + 2*padding;
+    bar.x = buttons[0].x - scaleBounds.w*1.2;
 
     // draw bar
     fill(255);
@@ -716,7 +714,7 @@ function drawStatusBar() {
     stroke(0);
     fill(0);
     text(scaleStatus, bar.x, bar.y + scaleBounds.h + padding);
-    text(atomStatus, buttons[0].x + buttons[0].w, bar.y + atomBounds.h + padding);
+    text(atomStatus, buttons[0].x + buttons[0].w*1.2, bar.y + atomBounds.h + padding);
     drawButton(0);
 }
 
