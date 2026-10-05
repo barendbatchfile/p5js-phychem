@@ -68,7 +68,7 @@ let phyicsConstents = {
     atomicMass: 1.660538921e-27,
 };
 
-let covalentRadiiPm = {
+let atomRadius = {
     1: 31,   // H
     2: 28,   // He
     3: 128,  // Li
@@ -512,7 +512,6 @@ function bounce(atomA, atomB) {
     let tempV = atomA.vx;
     atomA.vx = atomB.vx;
     atomB.vx = tempV;
-
     tempV = atomA.vy;
     atomA.vy = atomB.vy;
     atomB.vy = tempV;
