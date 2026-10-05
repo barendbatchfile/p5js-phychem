@@ -15,14 +15,14 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-let phyicsSettings = {
+let physicsSettings = {
     timeMultiplier: 1,
     gravityMultiplier: 1e8,
     softeningConst: 2,
 };
 
 let paused = false;
-let phyicsOptions = {
+let physicsOptions = {
     h: 0,
     w: 0,
     x: 0,
@@ -63,7 +63,7 @@ let phyicsOptions = {
     ],
 };
 
-let phyicsConstents = {
+let physicsConstents = {
     gravity: 6.67384e-11,
     atomicMass: 1.660538921e-27,
     spring: 1e-24,
@@ -207,8 +207,8 @@ let atomSelector = {
 };
 
 let atoms = [];
-let min_atom_diamater = 5;
-let max_atom_diamater = 0;
+let minAtomDiamater = 5;
+let maxAtomDiamater = 0;
 let atomSelectorOpen = false;
 let showWelcome = true;
 let checkBoxSize = 0;
@@ -306,7 +306,7 @@ function setup() {
     updateCenter();
     updateButtons();
     textSize(16);
-    max_atom_diamater = 2*max(width, height);
+    maxAtomDiamater = 2*max(width, height);
     let bounds = textBounds("W", 0, 0);
     checkBoxSize = 1.1*max(bounds.h, bounds.w);
 }
@@ -351,20 +351,20 @@ function mouseClicked() {
 	return;
     }
 
-    if (mouseX > phyicsOptions.x &&
-	mouseX < phyicsOptions.x + phyicsOptions.w &&
-	mouseY > phyicsOptions.y &&
-	mouseY < phyicsOptions.y + phyicsOptions.h) {
+    if (mouseX > physicsOptions.x &&
+	mouseX < physicsOptions.x + physicsOptions.w &&
+	mouseY > physicsOptions.y &&
+	mouseY < physicsOptions.y + physicsOptions.h) {
 	if (isMouseOverButton(1)) {
 	    console.log("clicked button 1 (physics settings)");
 	    physicsSettingsOpen = !physicsSettingsOpen;
 	    return;
 	}
 
-	for (let i = 0; i < phyicsOptions.checkBoxes.length; i++) {
-	    let checkBox = phyicsOptions.checkBoxes[i];
-	    if (mouseX > phyicsOptions.x &&
-		mouseX < phyicsOptions.x + phyicsOptions.w &&
+	for (let i = 0; i < physicsOptions.checkBoxes.length; i++) {
+	    let checkBox = physicsOptions.checkBoxes[i];
+	    if (mouseX > physicsOptions.x &&
+		mouseX < physicsOptions.x + physicsOptions.w &&
 		mouseY > checkBox.y &&
 		mouseY < checkBox.y + checkBox.h) {
 		checkBox.value = !checkBox.value;
@@ -386,7 +386,7 @@ function mouseClicked() {
 	}
 
 	let x = atomSelector.x + padding;
-	let y = atomSelector.y + 3 * padding + lineSize;
+	let y = buttons[3].y + 3 * padding + lineSize;
 	stroke(0);
 	for (let i = 0; i < atomSelector.periodicTable.length; i++) {
 	    if (mouseX > x &&
@@ -474,7 +474,7 @@ function mouseWheel(event) {
 
 function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
-    max_atom_diamater = 2*max(width, height),
+    max_atom_diamater = 2*max(width, height);
     updateCenter();
     updateButtons();
 }
@@ -485,13 +485,13 @@ function processGravity(dt) {
 	for (let j = 0; j < atoms.length; j++) {
 	    if (i === j) { continue; }
 	    let atomB = atoms[j];
-	    let massB = atomB.A * phyicsConstents.atomicMass; // convert mass in u to kg.
+	    let massB = atomB.A * physicsConstents.atomicMass; // convert mass in u to kg.
 
 	    let dx = atomB.x - atomA.x;
 	    let dy = atomB.y - atomA.y;
 	    let r;
-	    if (phyicsOptions.checkBoxes[3].value) {
-		let softening = phyicsSettings.softeningConst * (atomA.r + atomB.r);
+	    if (physicsOptions.checkBoxes[3].value) {
+		let softening = physicsSettings.softeningConst * (atomA.r + atomB.r);
 		r = sqrt(dx * dx + dy * dy + softening * softening);
 	    } else {
 		r = sqrt(dx * dx + dy * dy);
@@ -499,7 +499,7 @@ function processGravity(dt) {
 
 	    if (r === 0) { continue; }
 
-	    let a = phyicsConstents.gravity * massB / (r**2) * phyicsSettings.gravityMultiplier;
+	    let a = physicsConstents.gravity * massB / (r**2) * physicsSettings.gravityMultiplier;
 	    atomA.ax += a * dx / r;
 	    atomA.ay += a * dy / r;
 	}
@@ -512,32 +512,32 @@ function bounce(atomA, atomB) {
     let distance = dist(atomA.x , atomA.y, atomB.x, atomB.y);
     let u = atomA.r + atomB.r - distance;
 
-    let massA = (atomA.A * phyicsConstents.atomicMass);
-    let massB = (atomB.A * phyicsConstents.atomicMass);
+    if (distance === 0) { return; }
+    let massA = (atomA.A * physicsConstents.atomicMass);
+    let massB = (atomB.A * physicsConstents.atomicMass);
     let nx = dx / distance;
     let ny = dy / distance;
 
-    if (distance === 0) { return; }
-    atomB.ay += phyicsConstents.spring * u / massB * ny;
-    atomB.ax += phyicsConstents.spring * u / massB * nx;
-    atomA.ax -= phyicsConstents.spring * u / massA * nx;
-    atomA.ay -= phyicsConstents.spring * u / massA * ny;
+    atomB.ay += physicsConstents.spring * u / massB * ny;
+    atomB.ax += physicsConstents.spring * u / massB * nx;
+    atomA.ax -= physicsConstents.spring * u / massA * nx;
+    atomA.ay -= physicsConstents.spring * u / massA * ny;
 }
 
-function processPhyics() {
-    let dt = deltaTime * phyicsSettings.timeMultiplier / 1000; //convert deltaTime from miliseconds to seconds.
+function processPhysics() {
+    let dt = deltaTime * physicsSettings.timeMultiplier / 1000; //convert deltaTime from miliseconds to seconds.
     for (let i = 0; i < atoms.length; i++) {
         atoms[i].ax = 0;
         atoms[i].ay = 0;
     }
 
     //gravity
-    if (phyicsOptions.checkBoxes[0].value) {
+    if (physicsOptions.checkBoxes[0].value) {
 	processGravity(dt);
     }
 
     //bounce
-    if (phyicsOptions.checkBoxes[1].value) {
+    if (physicsOptions.checkBoxes[1].value) {
 	for (let i = 0; i < atoms.length; i++) {
 	    let atomA = atoms[i];
 
@@ -550,7 +550,7 @@ function processPhyics() {
     }
 
     // movement
-    if (phyicsOptions.checkBoxes[2].value) {
+    if (physicsOptions.checkBoxes[2].value) {
 	for (let i = 0; i < atoms.length; i++) {
 	    atoms[i].vx += atoms[i].ax * dt;
 	    atoms[i].vy += atoms[i].ay * dt;
@@ -596,23 +596,25 @@ function keyTyped() {
 function handleKeys() {
     if (keyIsDown(RETURN)) showWelcome = false;
     if (showWelcome) { return; }
+
+    let panStep = cursorSpeed * deltaTime / 1000;
     if (keyIsDown(LEFT_ARROW) || keyIsDown(65)) {
-	cursor.x += cursorSpeed;
+	cursor.x += panStep;
 	centerX = offset.x + cursor.x;
     }
 
     if (keyIsDown(RIGHT_ARROW) || keyIsDown(68)) {
-	cursor.x -= cursorSpeed;
+	cursor.x -= panStep;
 	centerX = offset.x + cursor.x;
     }
 
     if (keyIsDown(UP_ARROW) || keyIsDown(87)) {
-	cursor.y += cursorSpeed;
+	cursor.y += panStep;
 	centerY = offset.y + cursor.y;
     }
 
     if (keyIsDown(DOWN_ARROW) || keyIsDown(83)) {
-	cursor.y -= cursorSpeed;
+	cursor.y -= panStep;
 	centerY = offset.y + cursor.y
     }
 }
@@ -631,7 +633,8 @@ function drawCoordinatePlane() {
 	let x = centerX + i * stepSize;
 	rect(x, 0, lineSize, height);
 
-	let txt = i + getUnit();
+	let value = Math.round(i * scale * 1000) / 1000;
+	let txt = value + getUnit();
 	let bounds = textBounds(txt, x, centerY);
 	text(txt, x + padding, centerY - bounds.h - padding);
     }
@@ -639,8 +642,8 @@ function drawCoordinatePlane() {
     for (let i = minMarkY; i <= maxMarkY; i++) {
 	let y = centerY - i * stepSize;
 	rect(0, y, width, lineSize);
-
-	let txt = i + getUnit();
+	let value = Math.round(i * scale * 1000) / 1000;
+	let txt = value + getUnit();
 	let bounds = textBounds(txt, centerX, y);
 	text(txt, centerX + padding, y - bounds.h - padding);
     }
@@ -654,7 +657,7 @@ function drawAtoms() {
 	let atom = atoms[i];
 	let x = centerX + atom.x / (scale*10**exponent) * stepSize;
 	let y = centerY + atom.y / (scale*10**exponent) * stepSize;
-	let d = min(max_atom_diamater, max(min_atom_diamater, 2 * atom.r * stepSize / (scale * 10 ** exponent)));
+	let d = constrain(2*atom.r * stepSize/(scale*10**exponent), minAtomDiamater, maxAtomDiamater);
 
 	if (x + d/2 < 0 ||
 	    x - d/2 > width ||
@@ -743,32 +746,32 @@ function drawPaused() {
 
 function drawPhysicsOptions() {
     let button = buttons[1];
-    phyicsOptions.h = padding + button.h + padding + lineSize/2;
-    phyicsOptions.w = 0;
-    for (let i = 0; i < phyicsOptions.checkBoxes.length; i++) {
-	let bounds = textBounds(phyicsOptions.checkBoxes[i].label, 0, 0);
-	phyicsOptions.w = max(phyicsOptions.w, bounds.w + 1.5 * padding + checkBoxSize);
+    physicsOptions.h = padding + button.h + padding + lineSize/2;
+    physicsOptions.w = 0;
+    for (let i = 0; i < physicsOptions.checkBoxes.length; i++) {
+	let bounds = textBounds(physicsOptions.checkBoxes[i].label, 0, 0);
+	physicsOptions.w = max(physicsOptions.w, bounds.w + 1.5 * padding + checkBoxSize);
     }
 
-    phyicsOptions.w = max(phyicsOptions.w, 1.5 * padding + button.h/2 + button.w) + 2 * padding;
-    for (let i = 0; i < phyicsOptions.checkBoxes.length; i++) {
-	let bounds = textBounds(phyicsOptions.checkBoxes[i].label, 0, 0);
-	phyicsOptions.h += max(bounds.h, checkBoxSize) + padding;
+    physicsOptions.w = max(physicsOptions.w, 1.5 * padding + button.h/2 + button.w) + 2 * padding;
+    for (let i = 0; i < physicsOptions.checkBoxes.length; i++) {
+	let bounds = textBounds(physicsOptions.checkBoxes[i].label, 0, 0);
+	physicsOptions.h += max(bounds.h, checkBoxSize) + padding;
     }
 
-    phyicsOptions.h += padding;
-    phyicsOptions.x = button.x - padding - button.h/2;
-    phyicsOptions.y = button.y - button.h;
+    physicsOptions.h += padding;
+    physicsOptions.x = button.x - padding - button.h/2;
+    physicsOptions.y = button.y - button.h;
 
     fill(255);
-    rect(phyicsOptions.x, phyicsOptions.y, phyicsOptions.w, phyicsOptions.h, 10);
+    rect(physicsOptions.x, physicsOptions.y, physicsOptions.w, physicsOptions.h, 10);
     fill(127);
     rect(button.x, button.y + 2 * padding - lineSize/2, button.w, lineSize);
 
     let y = button.y + 2.5 * padding + lineSize;
     textAlign(LEFT, CENTER);
-    for (let i = 0; i < phyicsOptions.checkBoxes.length; i++) {
-	let checkBox = phyicsOptions.checkBoxes[i];
+    for (let i = 0; i < physicsOptions.checkBoxes.length; i++) {
+	let checkBox = physicsOptions.checkBoxes[i];
 	checkBox.x = button.x;
 	checkBox.y = y;
 	checkBox.w = checkBoxSize;
@@ -802,10 +805,10 @@ function drawPhysicsSettings() {
     if (physicsSettingsOpen)  {
 	drawPhysicsOptions();
     } else {
-	phyicsOptions.h = button.h + padding;
-	phyicsOptions.w = button.w + button.h + padding;
-	phyicsOptions.x = button.x - padding - button.h/2;
-	phyicsOptions.y = button.y - button.h;
+	physicsOptions.h = button.h + padding;
+	physicsOptions.w = button.w + button.h + padding;
+	physicsOptions.x = button.x - padding - button.h/2;
+	physicsOptions.y = button.y - button.h;
 	rect(button.x - padding/2, button.y - button.h, button.w + padding, button.h + padding);
 	circle(button.x - padding/2, button.y - button.h/2 + padding/2, button.h+padding);
 	circle(button.x + button.w + padding/2, button.y - button.h/2 + padding/2, button.h+padding);
@@ -912,7 +915,7 @@ function draw() {
     background(172);
     fill(128, 255, 128);
     handleKeys();
-    if (!paused) { processPhyics(); }
+    if (!paused) { processPhysics(); }
     drawCoordinatePlane();
     drawAtoms();
     drawHud();
