@@ -235,28 +235,35 @@ let bar = {
 
 let buttons = [
     {
-	label: "Reset simulator",
+	label: "Reset",
 	x: 0,
 	y: 0,
 	w: 0,
 	h: 0,
     },
     {
-	label: "Physics settings",
+	label: "Settings",
 	x: 0,
 	y: 0,
 	w: 0,
 	h: 0,
     },
     {
-	label: "Pause simulation",
+	label: "Pause",
 	x: 0,
 	y: 0,
 	w: 0,
 	h: 0,
     },
     {
-	label: "Atom selector",
+	label: "Select atom",
+	x: 0,
+	y: 0,
+	w: 0,
+	h: 0,
+    },
+    {
+	label: "Help",
 	x: 0,
 	y: 0,
 	w: 0,
@@ -270,7 +277,7 @@ function updateButton(id) {
     if (id === 0) {
 	buttons[id].w = bounds.w;
 	buttons[id].h = bounds.h;
-	buttons[id].x = width/2 - buttons[id].w/2;
+	buttons[id].x = width/2 - buttons[id].w - padding;
 	buttons[id].y = 3*padding + buttons[id].h;
     } else if (id === 1) {
 	buttons[id].w = bounds.w;
@@ -285,6 +292,11 @@ function updateButton(id) {
 
 	bounds = textBounds("WW-WWW", 0, 0);
 	atomSelector.size = max(bounds.h, bounds.w);
+    } else if (id === 4) {
+	buttons[id].w = bounds.w;
+	buttons[id].h = bounds.h;
+	buttons[id].x = width/2 + padding;
+	buttons[id].y = 3*padding + buttons[id].h - textDescent(buttons[id].label);
     }
 }
 
@@ -421,6 +433,13 @@ function mouseClicked() {
 	    resetGame();
 	    return;
 	}
+
+	if (isMouseOverButton(4)) {
+	    console.log("clicked button 4 (help)");
+	    showWelcome = true;
+	    return;
+	}
+
 
 	return;
     }
@@ -623,14 +642,17 @@ function drawCoordinatePlane() {
     let minMarkX = Math.ceil((0 - centerX) / stepSize);
     let maxMarkX = Math.floor((width - centerX) / stepSize);
 
-    fill(0);
-    stroke(0);
+    noStroke();
     textSize(16);
 
     for (let i = minMarkX; i <= maxMarkX; i++) {
 	let x = centerX + i * stepSize;
+	fill(62);
+	stroke(62);
 	rect(x, 0, lineSize, height);
 
+	fill(0);
+	stroke(0);
 	let value = Math.round(i * scale * 1000) / 1000;
 	let txt = value + getUnit();
 	let bounds = textBounds(txt, x, centerY);
@@ -638,14 +660,20 @@ function drawCoordinatePlane() {
     }
 
     for (let i = minMarkY; i <= maxMarkY; i++) {
+	fill(62);
+	stroke(62);
 	let y = centerY - i * stepSize;
 	rect(0, y, width, lineSize);
+
+	fill(0);
+	stroke(0);
 	let value = Math.round(i * scale * 1000) / 1000;
 	let txt = value + getUnit();
 	let bounds = textBounds(txt, centerX, y);
 	text(txt, centerX + padding, y - bounds.h - padding);
     }
 
+    fill(0);
     rect(centerX - lineSize, 0, 2 * lineSize, height);
     rect(0, centerY - lineSize, width, 2 * lineSize);
 }
@@ -676,12 +704,12 @@ function drawAtoms() {
 		size -= 1;
 	    }
 
-	    if (size <= 0 || txtR <= d * 0.8) {
+	    if (size <= 4 || txtR <= d * 0.8) {
 		break;
 	    }
 	}
 
-	if (size > 0) {
+	if (size > 4) {
 	    textSize(size);
 	    fill(0);
 	    let bounds = textBounds(name, x, y);
@@ -693,16 +721,18 @@ function drawAtoms() {
 function drawStatusBar() {
     textSize(16);
     noStroke();
-    let scaleStatus = "scale = 1:" + scale*10**exponent;
+    let scaleStatus = "scale = 1:" + (scale*10**exponent).toExponential(2);
     let atomStatus = "atoms = " + atoms.length;
+    let fpsStatus = "fps = " + Math.round(frameRate());
 
     let scaleBounds = textBounds(scaleStatus, width/2, 0);
     let atomBounds = textBounds(atomStatus, width/2, 0);
+    let fpsBounds = textBounds(fpsStatus, width/2, 0);
 
     // recompute new bar.
     bar.h = buttons[0].h + 2*padding;
-    bar.w = buttons[0].w*1.2 + scaleBounds.w*1.2 + atomBounds.w*1.2 + 2*padding;
-    bar.x = buttons[0].x - scaleBounds.w*1.2;
+    bar.w = buttons[0].w + scaleBounds.w + atomBounds.w + fpsBounds.w + buttons[4].w + 2*padding + 4*padding;
+    bar.x = buttons[0].x - scaleBounds.w - padding;
 
     // draw bar
     fill(255);
@@ -714,16 +744,18 @@ function drawStatusBar() {
     stroke(0);
     fill(0);
     text(scaleStatus, bar.x, bar.y + scaleBounds.h + padding);
-    text(atomStatus, buttons[0].x + buttons[0].w*1.2, bar.y + atomBounds.h + padding);
+    text(atomStatus, buttons[4].x + buttons[4].w + padding, bar.y + atomBounds.h + padding);
+    text(fpsStatus, buttons[4].x + buttons[4].w+atomBounds.w+2*padding, bar.y + atomBounds.h + padding);
     drawButton(0);
+    drawButton(4);
 }
 
 function drawPaused() {
     let button = buttons[2];
     if (paused) {
-	button.label = "Resume simulation";
+	button.label = "Resume";
     } else {
-	button.label = "Pause simulation";
+	button.label = "Pause";
     }
 
     let bounds = textBounds(button.label, width/2, height);
