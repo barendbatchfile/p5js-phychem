@@ -615,22 +615,22 @@ function handleKeys() {
     if (showWelcome) { return; }
 
     let panStep = cursorSpeed * deltaTime / 1000;
-    if (keyIsDown(LEFT_ARROW) || keyIsDown(65)) {
+    if (keyIsDown('ArrowLeft') || keyIsDown('a')) {
 	cursor.x += panStep;
 	centerX = offset.x + cursor.x;
     }
 
-    if (keyIsDown(RIGHT_ARROW) || keyIsDown(68)) {
+    if (keyIsDown('ArrowRight') || keyIsDown('d')) {
 	cursor.x -= panStep;
 	centerX = offset.x + cursor.x;
     }
 
-    if (keyIsDown(UP_ARROW) || keyIsDown(87)) {
+    if (keyIsDown('ArrowUp') || keyIsDown('w')) {
 	cursor.y += panStep;
 	centerY = offset.y + cursor.y;
     }
 
-    if (keyIsDown(DOWN_ARROW) || keyIsDown(83)) {
+    if (keyIsDown('ArrowDown') || keyIsDown('s')) {
 	cursor.y -= panStep;
 	centerY = offset.y + cursor.y
     }
@@ -921,8 +921,8 @@ function drawWelcome() {
 
     UI:
     In the top middle part of your screen there is a bar with your current scale/zoom level compared to when you just launched the simulation. A reset button which reset the simulation, your cursor position, and your zoom, but not your settings. And a count of the total number of atoms in the simulation.
-    On the left side the is a button which opens a menu of settings for the physics engine.
-    On the right side the is a button which opens a menu for selecting different atoms.
+    On the left side there is a button which opens a menu of settings for the physics engine.
+    On the right side there is a button which opens a menu for selecting different atoms.
 In the bottom middle part of your screen there is a pause/resume button with pauses or resmuses the simuation.
 
     Good things to know:
