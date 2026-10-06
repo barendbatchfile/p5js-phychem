@@ -468,7 +468,7 @@ function mouseClicked() {
 	alpha: currentAtom.alpha,
 	beta: currentAtom.beta,
 	x: (mouseX - centerX) * (scale*10**exponent) / stepSize,
-	y: (mouseY - centerY) * (scale*10**exponent) / stepSize,
+	y: (centerY - mouseY) * (scale*10**exponent) / stepSize,
 	vx: 0,
 	vy: 0,
 	ax: 0,
@@ -704,7 +704,7 @@ function drawAtoms() {
     for (let i = 0; i < atoms.length; i++) {
 	let atom = atoms[i];
 	let x = centerX + atom.x / (scale*10**exponent) * stepSize;
-	let y = centerY + atom.y / (scale*10**exponent) * stepSize;
+	let y = centerY - atom.y / (scale*10**exponent) * stepSize;
 	let d = constrain(2*atom.r * stepSize/(scale*10**exponent), minAtomDiamater, maxAtomDiamater);
 
 	if (x + d/2 < 0 ||
