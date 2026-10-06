@@ -27,6 +27,7 @@ let physicsOptions = {
     w: 0,
     x: 0,
     y: 0,
+    open: false,
     checkBoxes: [
 	{
 	    label: "gravity",
@@ -63,35 +64,25 @@ let physicsOptions = {
     ],
 };
 
-let physicsConstents = {
+let physicsConstants = {
     gravity: 6.67384e-11,
     atomicMass: 1.660538921e-27,
     spring: 1e-24,
 };
 
-let atomRadius = {
-    1: 31,   // H
-    2: 28,   // He
-    3: 128,  // Li
-    4: 96,   // Be
-    5: 84,   // B
-    6: 76,   // C
-    7: 71,   // N
-    8: 66,   // O
-    9: 57,   // F
-    10: 58,  // Ne
-    11: 166, // Na
-    12: 141, // Mg
-    13: 121, // Al
-    14: 111, // Si
-    15: 107, // P
-    16: 105, // S
-    17: 102, // Cl
-    18: 106, // Ar
-};
-
 let secondsDay = 24 * 60 * 60;
 let secondsYear = 365.25*secondsDay;
+let currentAtom = {
+    symbol: "H",
+    A: 1,
+    Z: 1,
+    r: 31,
+    c: "#ff0000",
+    halfTime: 0,
+    alpha: false,
+    beta: false,
+};
+
 let periodicTable = [
     {symbol: "H", Z:1, r:31, c:"#ff0000",
      isotopes: [{A:1, halfTime: 0, alpha: false, beta: false},
@@ -112,26 +103,26 @@ let periodicTable = [
 		{A:10, halfTime: secondsYear*1.5e6, alpha: false, beta: true}],},
     {symbol: "B", Z:5, r:84, c:"#ff00ff",
      isotopes: [{A:8, halfTime: 0.77, alpha: false, beta: true},
-		{A:10, halfTime: 1e-16, alpha: true, beta: false},
+		{A:10, halfTime: 0, alpha: false, beta: false},
 		{A:11, halfTime: 0, alpha: false, beta: false},
 		{A:12, halfTime: 0.02, alpha: false, beta: true}],},
     {symbol: "C", Z:6, r:76, c:"#00ffff",
      isotopes: [{A:10, halfTime: 19.2, alpha: false, beta: true},
-		{A:11, halfTime: 20.4*60, alpha: true, beta: false},
+		{A:11, halfTime: 20.4*60, alpha: false, beta: true},
 		{A:12, halfTime: 0, alpha: false, beta: false},
-		{A:13, halfTime: 02, alpha: false, beta: true},
+		{A:13, halfTime: 0, alpha: false, beta: false},
 		{A:14, halfTime: 5730*secondsYear, alpha: false, beta: true}],},
     {symbol: "N", Z:7, r:71, c:"#bb0000",
      isotopes: [{A:12, halfTime: 0.011, alpha: false, beta: true},
 		{A:13, halfTime: 9.97*60, alpha: false, beta: true},
 		{A:14, halfTime: 0, alpha: false, beta: false},
-		{A:15, halfTime: 0, alpha: false, beta: true},
+		{A:15, halfTime: 0, alpha: false, beta: false},
 		{A:16, halfTime: 7.13, alpha: false, beta: true}],},
     {symbol: "O", Z:8, r:66, c:"#00bb00",
      isotopes: [{A:15, halfTime: 0.011, alpha: false, beta: true},
-		{A:16, halfTime: 9.97*60, alpha: false, beta: true},
+		{A:16, halfTime: 0, alpha: false, beta: false},
 		{A:17, halfTime: 0, alpha: false, beta: false},
-		{A:18, halfTime: 0, alpha: false, beta: true},
+		{A:18, halfTime: 0, alpha: false, beta: false},
 		{A:19, halfTime: 7.13, alpha: false, beta: true}],},
     {symbol: "F", Z:9, r:57, c:"#0000bb",
      isotopes: [{A:19, halfTime: 0, alpha: false, beta: false},],},
@@ -143,7 +134,7 @@ let periodicTable = [
     {symbol: "Na", Z:11, r:166, c:"#00bbbb",
      isotopes: [{A:22, halfTime: 2.6*secondsYear, alpha: false, beta: true},
 		{A:23, halfTime: 0, alpha: false, beta: false},
-		{A:24, halfTime: 14.96*3600, alpha: false, beta: true}, ,],},
+		{A:24, halfTime: 14.96*3600, alpha: false, beta: true},],},
     {symbol: "Mg", Z:12, r:141, c:"#bb00bb",
      isotopes: [{A:22, halfTime: 3.9, alpha: false, beta: true},
 		{A:24, halfTime: 0, alpha: false, beta: false},
@@ -164,7 +155,7 @@ let periodicTable = [
      isotopes: [{A:30, halfTime: 2.5*60, alpha: false, beta: true},
 		{A:31, halfTime: 0, alpha: false, beta: false},
 		{A:32, halfTime: 14.3*secondsDay, alpha: false, beta: true},
-		{A:32, halfTime: 25.3*secondsDay, alpha: false, beta: true},],},
+		{A:33, halfTime: 25.3*secondsDay, alpha: false, beta: true},],},
     {symbol: "S", Z:16, r:105, c:"#999900",
      isotopes: [{A:32, halfTime: 0, alpha: false, beta: false},
 		{A:33, halfTime: 0, alpha: false, beta: false},
@@ -189,127 +180,22 @@ let periodicTable = [
 
 let atomSelector = {
     size: 0,
-    count: 3,
+    open: false,
+    columns: 4,
+    count: 0,
+    scroll: 0,
+    max: 0,
     h: 0,
     w: 0,
     x: 0,
     y: 0,
-    current: 0,
-    atoms: [
-	{
-	    symbol: "H",
-	    Z: 1,
-	    A: 1,
-	    x: 0,
-	    y: 0,
-	    vx: 0,
-	    vy: 0,
-	    ax: 0,
-	    ay: 0,
-	    c: "#00ff00",
-	    r: 0,
-	},
-	{
-	    symbol: "H",
-	    Z: 1,
-	    A: 2,
-	    x: 0,
-	    y: 0,
-	    vx: 0,
-	    vy: 0,
-	    ax: 0,
-	    ay: 0,
-	    c: "#00ff00",
-	    r: 0,
-	},
-	{
-	    symbol: "H",
-	    Z: 1,
-	    A: 3,
-	    x: 0,
-	    y: 0,
-	    vx: 0,
-	    vy: 0,
-	    ax: 0,
-	    ay: 0,
-	    c: "#00ff00",
-	    r: 0,
-	},
-	{
-	    symbol: "O",
-	    Z: 8,
-	    A: 15,
-	    x: 0,
-	    y: 0,
-	    vx: 0,
-	    vy: 0,
-	    ax: 0,
-	    ay: 0,
-	    c: "#5555ff",
-	    r: 0,
-	},
-	{
-	    symbol: "O",
-	    Z: 8,
-	    A: 16,
-	    x: 0,
-	    y: 0,
-	    vx: 0,
-	    vy: 0,
-	    ax: 0,
-	    ay: 0,
-	    c: "#5555ff",
-	    r: 0,
-	},
-	{
-	    symbol: "O",
-	    Z: 8,
-	    A: 17,
-	    x: 0,
-	    y: 0,
-	    vx: 0,
-	    vy: 0,
-	    ax: 0,
-	    ay: 0,
-	    c: "#5555ff",
-	    r: 0,
-	},
-	{
-	    symbol: "O",
-	    Z: 8,
-	    A: 18,
-	    x: 0,
-	    y: 0,
-	    vx: 0,
-	    vy: 0,
-	    ax: 0,
-	    ay: 0,
-	    c: "#5555ff",
-	    r: 0,
-	},
-	{
-	    symbol: "O",
-	    Z: 8,
-	    A: 19,
-	    x: 0,
-	    y: 0,
-	    vx: 0,
-	    vy: 0,
-	    ax: 0,
-	    ay: 0,
-	    c: "#5555ff",
-	    r: 0,
-	},
-    ],
 };
 
 let atoms = [];
 let minAtomDiamater = 5;
 let maxAtomDiamater = 0;
-let atomSelectorOpen = false;
 let showWelcome = true;
 let checkBoxSize = 0;
-let physicsSettingsOpen = false;
 let lineSize = 2;
 let exponent = 0;
 let scale = 1;
@@ -418,6 +304,10 @@ function setup() {
     maxAtomDiamater = 2*max(width, height);
     let bounds = textBounds("W", 0, 0);
     checkBoxSize = 1.1*max(bounds.h, bounds.w);
+    for (let i = 0; i < periodicTable.length; i++) {
+	atomSelector.count += periodicTable[i].isotopes.length;
+    }
+
 }
 
 function mousePressed() {
@@ -465,7 +355,7 @@ function mouseClicked() {
 	mouseY < physicsOptions.y + physicsOptions.h) {
 	if (isMouseOverButton(1)) {
 	    console.log("clicked button 1 (physics settings)");
-	    physicsSettingsOpen = !physicsSettingsOpen;
+	    physicsOptions.open = !physicsOptions.open;
 	    return;
 	}
 
@@ -489,32 +379,48 @@ function mouseClicked() {
 	mouseY < atomSelector.y + atomSelector.h) {
 	if (isMouseOverButton(3)) {
 	    console.log("clicked button 3 (atom selector)");
-	    atomSelectorOpen = !atomSelectorOpen;
+	    atomSelector.open = !atomSelector.open;
 	    return;
 	}
 
 	let x = atomSelector.x + padding;
 	let y = buttons[3].y + 3 * padding + lineSize;
+	let totalIndex = 0;
+	let placed = 0;
 	stroke(0);
-	for (let i = 0; i < atomSelector.atoms.length; i++) {
-	    if (mouseX > x &&
-		mouseX < x + atomSelector.size &&
-		mouseY > y &&
-		mouseY < y + atomSelector.size) {
-		atomSelector.current = i;
-		atomSelectorOpen = false;
-		return;
-	    }
+	for (let i = 0; i < periodicTable.length; i++) {
+	    for (let j = 0; j < periodicTable[i].isotopes.length; j++) {
+		totalIndex += 1;
+		if (totalIndex <= atomSelector.scroll * atomSelector.columns) continue;
+		placed += 1;
+		if (placed > atomSelector.max) continue;
+		if (mouseX > x &&
+		    mouseX < x + atomSelector.size &&
+		    mouseY > y &&
+		    mouseY < y + atomSelector.size) {
+		    let atom = periodicTable[i]
+		    currentAtom = {
+			symbol: atom.symbol,
+			A: atom.isotopes[j].A,
+			Z: atom.Z,
+			r: atom.r,
+			c: atom.c,
+			    halfTime: atom.isotopes[j].halfTime,
+			    alpha: atom.isotopes[j].alpha,
+			    beta: atom.isotopes[j].beta,
+			};
 
-	    let atom = atomSelector.atoms[i];
-	    let bounds = textBounds(atom.symbol + "-" + atom.A, 0, 0);
-	    square(x, y, atomSelector.size);
+			console.log("clicked: (%d, %d)", i, j);
+			atomSelector.open = false;
+			return;
+		    }
 
-	    if ((i+1)% atomSelector.count === 0) {
-		y += atomSelector.size;
-		x = atomSelector.x + padding;
-	    } else {
-		x += atomSelector.size;
+		if (placed%atomSelector.columns === 0) {
+		    y += atomSelector.size;
+		    x = atomSelector.x + padding;
+		} else {
+		    x += atomSelector.size;
+		}
 	    }
 	}
 
@@ -552,21 +458,40 @@ function mouseClicked() {
     }
 
     if (dragging) { return; }
+    let atom = {
+	symbol: currentAtom.symbol,
+	A: currentAtom.A,
+	Z: currentAtom.Z,
+	r: currentAtom.r * 1e-12,
+	c: currentAtom.c,
+	halfTime: currentAtom.halfTime,
+	alpha: currentAtom.alpha,
+	beta: currentAtom.beta,
+	x: (mouseX - centerX) * (scale*10**exponent) / stepSize,
+	y: (mouseY - centerY) * (scale*10**exponent) / stepSize,
+	vx: 0,
+	vy: 0,
+	ax: 0,
+	ay: 0,
+    };
 
-    let atom = Object.create(atomSelector.atoms[atomSelector.current]);
-    let radius = atomRadius[atom.Z];
-    if (radius === undefined) {
-	atom.r = 100e-12;
-    } else {
-	atom.r = radius * 1e-12;
-    }
-
-    atom.x = (mouseX - centerX) * (scale*10**exponent) / stepSize;
-    atom.y = (mouseY - centerY) * (scale*10**exponent) / stepSize;
     atoms.push(atom);
 }
 
 function mouseWheel(event) {
+    if (mouseX > atomSelector.x &&
+	mouseX < atomSelector.x + atomSelector.w &&
+	mouseY > atomSelector.y &&
+	mouseY < atomSelector.y + atomSelector.h) {
+
+	let prev = atomSelector.scroll;
+	(event.delta > 0) ? atomSelector.scroll += 1 : atomSelector.scroll -= 1;
+	if (atomSelector.scroll < 0) atomSelector.scroll = 0;
+	if (atomSelector.count - atomSelector.scroll*atomSelector.columns + atomSelector.columns-1 < atomSelector.max) atomSelector.scroll = prev;
+
+	return false;
+    }
+
     let oldPixelsPerUnit = stepSize / (scale*10**exponent);
 
     if (exponent < 3 && event.delta > 0) { scale *= 2};
@@ -599,7 +524,7 @@ function processGravity(dt) {
 	for (let j = 0; j < atoms.length; j++) {
 	    if (i === j) { continue; }
 	    let atomB = atoms[j];
-	    let massB = atomB.A * physicsConstents.atomicMass; // convert mass in u to kg.
+	    let massB = atomB.A * physicsConstants.atomicMass; // convert mass in u to kg.
 
 	    let dx = atomB.x - atomA.x;
 	    let dy = atomB.y - atomA.y;
@@ -613,7 +538,7 @@ function processGravity(dt) {
 
 	    if (r === 0) { continue; }
 
-	    let a = physicsConstents.gravity * massB / (r**2) * physicsSettings.gravityMultiplier;
+	    let a = physicsConstants.gravity * massB / (r**2) * physicsSettings.gravityMultiplier;
 	    atomA.ax += a * dx / r;
 	    atomA.ay += a * dy / r;
 	}
@@ -627,15 +552,15 @@ function bounce(atomA, atomB) {
     let u = atomA.r + atomB.r - distance;
 
     if (distance === 0) { return; }
-    let massA = (atomA.A * physicsConstents.atomicMass);
-    let massB = (atomB.A * physicsConstents.atomicMass);
+    let massA = (atomA.A * physicsConstants.atomicMass);
+    let massB = (atomB.A * physicsConstants.atomicMass);
     let nx = dx / distance;
     let ny = dy / distance;
 
-    atomB.ay += physicsConstents.spring * u / massB * ny;
-    atomB.ax += physicsConstents.spring * u / massB * nx;
-    atomA.ax -= physicsConstents.spring * u / massA * nx;
-    atomA.ay -= physicsConstents.spring * u / massA * ny;
+    atomB.ay += physicsConstants.spring * u / massB * ny;
+    atomB.ax += physicsConstants.spring * u / massB * nx;
+    atomA.ax -= physicsConstants.spring * u / massA * nx;
+    atomA.ay -= physicsConstants.spring * u / massA * ny;
 }
 
 function processPhysics() {
@@ -929,7 +854,7 @@ function drawPhysicsSettings() {
     noStroke();
 
     let button = buttons[1];
-    if (physicsSettingsOpen)  {
+    if (physicsOptions.open)  {
 	drawPhysicsOptions();
     } else {
 	physicsOptions.h = button.h + padding;
@@ -949,28 +874,36 @@ function drawAtomSelectorOpen() {
     noStroke();
 
     let button = buttons[3];
-    atomSelector.h = button.h + 4*padding + lineSize + Math.ceil(atomSelector.atoms.length/atomSelector.count) * atomSelector.size;
-    atomSelector.w = max(button.w + button.h, 3*atomSelector.size) + 2*padding;
+    let heading = button.h + 4*padding + lineSize
+    atomSelector.max = floor((height - heading)/atomSelector.size) * atomSelector.columns;
+    atomSelector.h = heading + Math.ceil(min(atomSelector.count, atomSelector.max)/atomSelector.columns) * atomSelector.size;
+    atomSelector.w = max(button.w + button.h, atomSelector.columns*atomSelector.size) + 2*padding;
     atomSelector.x = width - atomSelector.w - 2*padding - button.h/2;
     atomSelector.y = button.y - button.h;
     rect(atomSelector.x, atomSelector.y, atomSelector.w, atomSelector.h, 10);
     fill(127);
-    rect(atomSelector.x + padding/2, button.y + 2 * padding - lineSize/2, atomSelector.count*atomSelector.size, lineSize);
+    rect(atomSelector.x + padding/2, button.y + 2 * padding - lineSize/2, atomSelector.columns*atomSelector.size, lineSize);
 
     let x = atomSelector.x + padding;
     let y = button.y + 3 * padding + lineSize;
+    let totalIndex = 0;
+    let placed = 0;
     stroke(0);
     for (let i = 0; i < periodicTable.length; i++) {
 	for (let j = 0; j < periodicTable[i].isotopes.length; j++) {
+	    totalIndex += 1;
+	    if (totalIndex <= atomSelector.scroll * atomSelector.columns) continue;
+	    placed += 1;
+	    if (placed > atomSelector.max) continue;
 	    let atom = periodicTable[i].isotopes[j];
-	    let txt = periodicTable[i].symbol + "-" + atom.A;
+	    let txt = periodicTable[i].symbol + "-" + periodicTable[i].isotopes[j].A;
 	    let bounds = textBounds(txt, 0, 0);
 	    fill(periodicTable[i].c);
 	    square(x, y, atomSelector.size);
 	    fill(0);
 	    text(txt, x + (atomSelector.size - bounds.w)/2, y + atomSelector.size -(atomSelector.size - bounds.h)/2);
 
-	    if ((j+1)% atomSelector.count === 0) {
+	    if (placed%atomSelector.columns === 0) {
 		y += atomSelector.size;
 		x = atomSelector.x + padding;
 	    } else {
@@ -987,7 +920,7 @@ function drawAtomSelector() {
     noStroke();
 
     let button = buttons[3];
-    if (atomSelectorOpen)  {
+    if (atomSelector.open)  {
 	drawAtomSelectorOpen();
     } else {
 	atomSelector.h = button.h + padding;
