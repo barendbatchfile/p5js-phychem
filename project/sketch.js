@@ -960,20 +960,22 @@ function drawAtomSelectorOpen() {
     let x = atomSelector.x + padding;
     let y = button.y + 3 * padding + lineSize;
     stroke(0);
-    for (let i = 0; i < atomSelector.atoms.length; i++) {
-	let atom = atomSelector.atoms[i];
-	let txt = atom.symbol + "-" + atom.A;
-	let bounds = textBounds(txt, 0, 0);
-	fill(atom.c);
-	square(x, y, atomSelector.size);
-	fill(0);
-	text(txt, x + (atomSelector.size - bounds.w)/2, y + atomSelector.size -(atomSelector.size - bounds.h)/2);
+    for (let i = 0; i < periodicTable.length; i++) {
+	for (let j = 0; j < periodicTable[i].isotopes.length; j++) {
+	    let atom = periodicTable[i].isotopes[j];
+	    let txt = periodicTable[i].symbol + "-" + atom.A;
+	    let bounds = textBounds(txt, 0, 0);
+	    fill(periodicTable[i].c);
+	    square(x, y, atomSelector.size);
+	    fill(0);
+	    text(txt, x + (atomSelector.size - bounds.w)/2, y + atomSelector.size -(atomSelector.size - bounds.h)/2);
 
-	if ((i+1)% atomSelector.count === 0) {
-	    y += atomSelector.size;
-	    x = atomSelector.x + padding;
-	} else {
-	    x += atomSelector.size;
+	    if ((j+1)% atomSelector.count === 0) {
+		y += atomSelector.size;
+		x = atomSelector.x + padding;
+	    } else {
+		x += atomSelector.size;
+	    }
 	}
     }
 
