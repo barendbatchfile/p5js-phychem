@@ -90,6 +90,103 @@ let atomRadius = {
     18: 106, // Ar
 };
 
+let secondsDay = 24 * 60 * 60;
+let secondsYear = 365.25*secondsDay;
+let periodicTable = [
+    {symbol: "H", Z:1, r:31, c:"#ff0000",
+     isotopes: [{A:1, halfTime: 0, alpha: false, beta: false},
+		{A:2, halfTime: 0, alpha: false, beta: false},
+		{A:3, halfTime: 12.3*secondsYear, alpha: false, beta: true}],},
+    {symbol: "He", Z:2, r:28, c:"#00ff00",
+     isotopes: [{A:3, halfTime: 0, alpha: false, beta: false},
+		{A:4, halfTime: 0, alpha: false, beta: false},
+		{A:6, halfTime: 0.807, alpha: false, beta: true}],},
+    {symbol: "Li", Z:3, r:128, c:"#0000ff",
+     isotopes: [{A:6, halfTime: 0, alpha: false, beta: false},
+		{A:7, halfTime: 0, alpha: false, beta: false},
+		{A:8, halfTime: 0.838, alpha: false, beta: true}],},
+    {symbol: "Be", Z:4, r:96, c:"#ffff00",
+     isotopes: [{A:7, halfTime: 0, alpha: false, beta: false},
+		{A:8, halfTime: 1e-16, alpha: true, beta: false},
+		{A:9, halfTime: 0, alpha: false, beta: false},
+		{A:10, halfTime: secondsYear*1.5e6, alpha: false, beta: true}],},
+    {symbol: "B", Z:5, r:84, c:"#ff00ff",
+     isotopes: [{A:8, halfTime: 0.77, alpha: false, beta: true},
+		{A:10, halfTime: 1e-16, alpha: true, beta: false},
+		{A:11, halfTime: 0, alpha: false, beta: false},
+		{A:12, halfTime: 0.02, alpha: false, beta: true}],},
+    {symbol: "C", Z:6, r:76, c:"#00ffff",
+     isotopes: [{A:10, halfTime: 19.2, alpha: false, beta: true},
+		{A:11, halfTime: 20.4*60, alpha: true, beta: false},
+		{A:12, halfTime: 0, alpha: false, beta: false},
+		{A:13, halfTime: 02, alpha: false, beta: true},
+		{A:14, halfTime: 5730*secondsYear, alpha: false, beta: true}],},
+    {symbol: "N", Z:7, r:71, c:"#bb0000",
+     isotopes: [{A:12, halfTime: 0.011, alpha: false, beta: true},
+		{A:13, halfTime: 9.97*60, alpha: false, beta: true},
+		{A:14, halfTime: 0, alpha: false, beta: false},
+		{A:15, halfTime: 0, alpha: false, beta: true},
+		{A:16, halfTime: 7.13, alpha: false, beta: true}],},
+    {symbol: "O", Z:8, r:66, c:"#00bb00",
+     isotopes: [{A:15, halfTime: 0.011, alpha: false, beta: true},
+		{A:16, halfTime: 9.97*60, alpha: false, beta: true},
+		{A:17, halfTime: 0, alpha: false, beta: false},
+		{A:18, halfTime: 0, alpha: false, beta: true},
+		{A:19, halfTime: 7.13, alpha: false, beta: true}],},
+    {symbol: "F", Z:9, r:57, c:"#0000bb",
+     isotopes: [{A:19, halfTime: 0, alpha: false, beta: false},],},
+    {symbol: "Ne", Z:10, r:58, c:"#bbbb00",
+     isotopes: [{A:20, halfTime: 0, alpha: false, beta: false},
+		{A:21, halfTime: 0, alpha: false, beta: false},
+		{A:22, halfTime: 0, alpha: false, beta: false},
+		{A:24, halfTime: 3.38*60, alpha: false, beta: true},],},
+    {symbol: "Na", Z:11, r:166, c:"#00bbbb",
+     isotopes: [{A:22, halfTime: 2.6*secondsYear, alpha: false, beta: true},
+		{A:23, halfTime: 0, alpha: false, beta: false},
+		{A:24, halfTime: 14.96*3600, alpha: false, beta: true}, ,],},
+    {symbol: "Mg", Z:12, r:141, c:"#bb00bb",
+     isotopes: [{A:22, halfTime: 3.9, alpha: false, beta: true},
+		{A:24, halfTime: 0, alpha: false, beta: false},
+		{A:25, halfTime: 0, alpha: false, beta: false},
+		{A:26, halfTime: 0, alpha: false, beta: false},
+		{A:28, halfTime: 14.96*3600, alpha: false, beta: true},],},
+    {symbol: "Al", Z:13, r:121, c:"#990000",
+     isotopes: [{A:26, halfTime: secondsYear*7.17e7, alpha: false, beta: true},
+		{A:27, halfTime: 0, alpha: false, beta: false},
+		{A:28, halfTime: 2.4*60, alpha: false, beta: true},],},
+    {symbol: "Si", Z:14, r:111, c:"#009900",
+     isotopes: [{A:28, halfTime: 0, alpha: false, beta: false},
+		{A:29, halfTime: 0, alpha: false, beta: false},
+		{A:30, halfTime: 0, alpha: false, beta: false},
+		{A:31, halfTime: 2.6*3600, alpha: false, beta: true},
+		{A:32, halfTime: secondsYear*150, alpha: false, beta: true},],},
+    {symbol: "P", Z:15, r:107, c:"#000099",
+     isotopes: [{A:30, halfTime: 2.5*60, alpha: false, beta: true},
+		{A:31, halfTime: 0, alpha: false, beta: false},
+		{A:32, halfTime: 14.3*secondsDay, alpha: false, beta: true},
+		{A:32, halfTime: 25.3*secondsDay, alpha: false, beta: true},],},
+    {symbol: "S", Z:16, r:105, c:"#999900",
+     isotopes: [{A:32, halfTime: 0, alpha: false, beta: false},
+		{A:33, halfTime: 0, alpha: false, beta: false},
+		{A:34, halfTime: 0, alpha: false, beta: false},
+		{A:35, halfTime: 87.3*secondsDay, alpha: false, beta: true},
+		{A:36, halfTime: 0, alpha: false, beta: false},
+		{A:38, halfTime: 2.84*secondsDay, alpha: false, beta: true},],},
+    {symbol: "Cl", Z:17, r:102, c:"#990099",
+     isotopes: [{A:34, halfTime: 1.53, alpha: false, beta: true},
+		{A:35, halfTime: 0, alpha: false, beta: false},
+		{A:36, halfTime: secondsYear*3.01e5, alpha: false, beta: true},
+		{A:37, halfTime: 0, alpha: false, beta: false},
+		{A:38, halfTime: 37.2*60, alpha: false, beta: true},
+		{A:39, halfTime: 55.5*60, alpha: false, beta: true},],},
+    {symbol: "Ar", Z:18, r:106, c:"#009999",
+     isotopes: [{A:36, halfTime: 0, alpha: false, beta: false},
+		{A:37, halfTime: 0, alpha: false, beta: false},
+		{A:38, halfTime: 0, alpha: false, beta: false},
+		{A:39, halfTime: 269*secondsDay, alpha: false, beta: true},
+		{A:40, halfTime: 0, alpha: false, beta: false},],},
+];
+
 let atomSelector = {
     size: 0,
     count: 3,
@@ -98,7 +195,7 @@ let atomSelector = {
     x: 0,
     y: 0,
     current: 0,
-    periodicTable: [
+    atoms: [
 	{
 	    symbol: "H",
 	    Z: 1,
@@ -399,7 +496,7 @@ function mouseClicked() {
 	let x = atomSelector.x + padding;
 	let y = buttons[3].y + 3 * padding + lineSize;
 	stroke(0);
-	for (let i = 0; i < atomSelector.periodicTable.length; i++) {
+	for (let i = 0; i < atomSelector.atoms.length; i++) {
 	    if (mouseX > x &&
 		mouseX < x + atomSelector.size &&
 		mouseY > y &&
@@ -409,7 +506,7 @@ function mouseClicked() {
 		return;
 	    }
 
-	    let atom = atomSelector.periodicTable[i];
+	    let atom = atomSelector.atoms[i];
 	    let bounds = textBounds(atom.symbol + "-" + atom.A, 0, 0);
 	    square(x, y, atomSelector.size);
 
@@ -456,7 +553,7 @@ function mouseClicked() {
 
     if (dragging) { return; }
 
-    let atom = Object.create(atomSelector.periodicTable[atomSelector.current]);
+    let atom = Object.create(atomSelector.atoms[atomSelector.current]);
     let radius = atomRadius[atom.Z];
     if (radius === undefined) {
 	atom.r = 100e-12;
@@ -852,7 +949,7 @@ function drawAtomSelectorOpen() {
     noStroke();
 
     let button = buttons[3];
-    atomSelector.h = button.h + 4*padding + lineSize + Math.ceil(atomSelector.periodicTable.length/atomSelector.count) * atomSelector.size;
+    atomSelector.h = button.h + 4*padding + lineSize + Math.ceil(atomSelector.atoms.length/atomSelector.count) * atomSelector.size;
     atomSelector.w = max(button.w + button.h, 3*atomSelector.size) + 2*padding;
     atomSelector.x = width - atomSelector.w - 2*padding - button.h/2;
     atomSelector.y = button.y - button.h;
@@ -863,8 +960,8 @@ function drawAtomSelectorOpen() {
     let x = atomSelector.x + padding;
     let y = button.y + 3 * padding + lineSize;
     stroke(0);
-    for (let i = 0; i < atomSelector.periodicTable.length; i++) {
-	let atom = atomSelector.periodicTable[i];
+    for (let i = 0; i < atomSelector.atoms.length; i++) {
+	let atom = atomSelector.atoms[i];
 	let txt = atom.symbol + "-" + atom.A;
 	let bounds = textBounds(txt, 0, 0);
 	fill(atom.c);
