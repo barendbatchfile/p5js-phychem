@@ -241,7 +241,7 @@ let minAtomDiamater = 5;
 let maxAtomDiamater = 0;
 let checkBoxSize = 0;
 let lineSize = 2;
-let exponent = 0;
+let exponent = -10;
 let scale = 1;
 let markDist = 300;
 let stepSize = markDist;
@@ -249,7 +249,7 @@ let centerX = 0;
 let centerY = 0;
 let offset = { x: 0, y: 0, };
 let cursor = { x: 0, y: 0, };
-let cursorSpeed = 50;
+let cursorSpeed = 800;
 let padding = 5;
 let dragging = false;
 let bar = {
@@ -386,7 +386,7 @@ function resetGame() {
     centerY = offset.y + cursor.y;
     centerX = offset.x + cursor.x;
 
-    exponent = 0;
+    exponent = -10;
     scale = 1;
     atoms = [];
 }
@@ -711,12 +711,34 @@ function mouseDragged() {
 
 function keyTyped() {
     if (homeMenu.open) { return; }
-    if (key === 'r') {
+    if (code === 'KeyR') {
 	resetGame();
     }
 
-    if (key === 'p') {
+    if (code === 'KeyP') {
 	paused = !paused;
+    }
+
+    if (code === 'KeyZ') {
+	atoms.pop();
+    }
+}
+
+function keyPressed() {
+    if (key === "Escape" || keyCode === 27) {
+        if (instructionsMenu.open) {
+            instructionsMenu.open = false;
+            homeMenu.open = true;
+        } else if (homeMenu.open) {
+            homeMenu.open = false;
+        } else if (atomSelector.open || physicsOptions.open) {
+            atomSelector.open = false;
+            physicsOptions.open = false;
+        } else {
+            homeMenu.open = true;
+        }
+
+        return false;
     }
 }
 
@@ -725,22 +747,22 @@ function handleKeys() {
     if (homeMenu.open) { return; }
 
     let panStep = cursorSpeed * deltaTime / 1000;
-    if (keyIsDown('ArrowLeft') || keyIsDown('a')) {
+    if (keyIsDown('ArrowLeft') || keyIsDown('KeyA')) {
 	cursor.x += panStep;
 	centerX = offset.x + cursor.x;
     }
 
-    if (keyIsDown('ArrowRight') || keyIsDown('d')) {
+    if (keyIsDown('ArrowRight') || keyIsDown('KeyD')) {
 	cursor.x -= panStep;
 	centerX = offset.x + cursor.x;
     }
 
-    if (keyIsDown('ArrowUp') || keyIsDown('w')) {
+    if (keyIsDown('ArrowUp') || keyIsDown('KeyW')) {
 	cursor.y += panStep;
 	centerY = offset.y + cursor.y;
     }
 
-    if (keyIsDown('ArrowDown') || keyIsDown('s')) {
+    if (keyIsDown('ArrowDown') || keyIsDown('KeyS')) {
 	cursor.y -= panStep;
 	centerY = offset.y + cursor.y
     }
@@ -1072,29 +1094,37 @@ function drawInstructionsMenu() {
     noStroke();
 
     let instructionText = [
-	"Buttons:",
-	"On the left of your screen there is a menu with settings for the physics engine.",
-	"On the right of your screen there is a menu where you can select the atom you're placing.",
-	"In the middle of your screen there are three buttons:",
-	"A pause/resume button, which pauses/resumes the simulation.",
-	"A Home button, which brings you to the main menu.",
-	"And finally a reset button, which reset the simulation, but not your settings.",
+	"UI-elements:",
+	"- left: settings menu for the physics engine.",
+	"- right menu to select an atom to place.",
+	"- middle bar with infomartion and the following buttons:",
+	"  - left: A button to pause/resume the simulation.",
+	"  - middle: A Home button to bring you to the main menu.",
+	"  - right: A button to reset the simulation, but not your settings.",
 	"",
 	"Move around by:",
 	"- Dragging the coordinateplane whiles holding down the left mouse button.",
 	"- By using the W-, A-, S-, and D-keys.",
 	"- By using the Arrow-keys.",
 	"",
-	"Place atoms by clicking with your left mouse button."
+	"Miscellaneous:",
+	"Place atoms by clicking with your left mouse button.",
+	"Press z to undo the last placement.",
     ];
 
     let textHeight = 0;
     let textWidth = 0;
     textSize(16);
+    let bBounds = textBounds("|", 0, 0);
+    let maxH = bBounds.h;
     for (let i = 0; i < instructionText.length; i++) {
-	let bounds = textBounds(instructionText[i], 0, 0);
-	textHeight += bounds.h + padding;
-	textWidth = max(textWidth, bounds.w);
+	if (instructionText[i] === "") {
+	    textHeight += maxH + padding;
+	} else {
+	    let bounds = textBounds(instructionText[i], 0, 0);
+	    textHeight += bounds.h + padding;
+	    textWidth = max(textWidth, bounds.w);
+	}
     }
 
     textSize(48);
@@ -1144,13 +1174,17 @@ function drawInstructionsMenu() {
     fill("#32302F");
     let x = width/2 - textWidth/2;
     let y = instructionsMenu.button.y + 12*padding;
-    rect(x-padding, y-padding, textWidth+2*padding,textHeight+2*padding);
+    rect(x-padding, y-padding, textWidth+2*padding,textHeight+2*padding, 10);
 
     fill("#EBDBB2");
     for (let i = 0; i < instructionText.length; i++) {
-	let bounds = textBounds(instructionText[i], 0, 0);
-	y += bounds.h + padding;
-	text(instructionText[i], x, y);
+	if (instructionText[i] === "") {
+	    y += maxH + padding;
+	} else {
+	    let bounds = textBounds(instructionText[i], 0, 0);
+	    y += bounds.h + padding;
+	    text(instructionText[i], x, y);
+	}
     }
 }
 
