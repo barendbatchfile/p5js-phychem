@@ -15,4 +15,4 @@
 - [X] de gebruiker kan de simulatie pauzeren.
 - [ ] reacties kunnen plaats vinden.
 - [ ] de gebruiker kan de snelheid aanpassen.
-- [ ] atomen kunnen vervallen.
+- [X] atomen kunnen vervallen.
