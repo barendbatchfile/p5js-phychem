@@ -19,7 +19,14 @@ let physicsSettings = {
     timeMultiplier: 1,
     gravityMultiplier: 1e8,
     softeningConst: 2,
+    betaSpeedMultiplier: 1e-17,
+    alphaSpeedMultiplier: 1e-17,
+    gammaSpeedMultiplier: 1e-18,
 };
+
+let gamma = [];
+let electrons = [];
+let positrons = [];
 
 let instructionsMenu = {
     open: false,
@@ -75,7 +82,7 @@ let physicsOptions = {
     open: false,
     checkBoxes: [
 	{
-	    label: "gravity",
+	    label: "Gravity",
 	    value: true,
 	    x: -100,
 	    y: -100,
@@ -83,7 +90,7 @@ let physicsOptions = {
 	    h: 0,
 	},
 	{
-	    label: "bounce",
+	    label: "Collision",
 	    value: true,
 	    x: -100,
 	    y: -100,
@@ -91,7 +98,7 @@ let physicsOptions = {
 	    h: 0,
 	},
 	{
-	    label: "movement",
+	    label: "Movement",
 	    value: true,
 	    x: -100,
 	    y: -100,
@@ -99,7 +106,15 @@ let physicsOptions = {
 	    h: 0,
 	},
 	{
-	    label: "softening",
+	    label: "Softening",
+	    value: true,
+	    x: -100,
+	    y: -100,
+	    w: 0,
+	    h: 0,
+	},
+	{
+	    label: "Radioactive decay",
 	    value: true,
 	    x: -100,
 	    y: -100,
@@ -113,6 +128,8 @@ let physicsConstants = {
     gravity: 6.67384e-11,
     atomicMass: 1.660538921e-27,
     spring: 1e-24,
+    C: 2.997e8,
+    elektronRadius: 2.81794e-15,
 };
 
 let secondsDay = 24 * 60 * 60;
@@ -125,102 +142,104 @@ let currentAtom = {
     c: "#ff0000",
     halfTime: 0,
     alpha: false,
-    beta: false,
+    betaMin: false,
+    betaPlus: false,
+    gamma: false,
 };
 
 let periodicTable = [
     {symbol: "H", Z:1, r:31, c:"#ff0000",
-     isotopes: [{A:1, halfTime: 0, alpha: false, beta: false},
-		{A:2, halfTime: 0, alpha: false, beta: false},
-		{A:3, halfTime: 12.3*secondsYear, alpha: false, beta: true}],},
+     isotopes: [{A:1, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
+		{A:2, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
+		{A:3, halfTime: 12.3*secondsYear, alpha: false, betaPlus: false, betaMin: true, gamma: false }],},
     {symbol: "He", Z:2, r:28, c:"#00ff00",
-     isotopes: [{A:3, halfTime: 0, alpha: false, beta: false},
-		{A:4, halfTime: 0, alpha: false, beta: false},
-		{A:6, halfTime: 0.807, alpha: false, beta: true}],},
+     isotopes: [{A:3, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
+		{A:4, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
+		{A:6, halfTime: 0.807, alpha: false, betaPlus: false, betaMin: true, gamma: false }],},
     {symbol: "Li", Z:3, r:128, c:"#ffff00",
-     isotopes: [{A:6, halfTime: 0, alpha: false, beta: false},
-		{A:7, halfTime: 0, alpha: false, beta: false},
-		{A:8, halfTime: 0.838, alpha: false, beta: true}],},
+     isotopes: [{A:6, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
+		{A:7, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
+		{A:8, halfTime: 0.838, alpha: false, betaPlus: false, betaMin: true, gamma: false }],},
     {symbol: "Be", Z:4, r:96, c:"#ff00ff",
-     isotopes: [{A:7, halfTime: 0, alpha: false, beta: false},
-		{A:8, halfTime: 1e-16, alpha: true, beta: false},
-		{A:9, halfTime: 0, alpha: false, beta: false},
-		{A:10, halfTime: secondsYear*1.5e6, alpha: false, beta: true}],},
+     isotopes: [{A:7, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
+		{A:8, halfTime: 1e-16, alpha: true, betaPlus: false, betaMin: false, gamma: false },
+		{A:9, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
+		{A:10, halfTime: secondsYear*1.5e6, alpha: false, betaPlus: false, betaMin: true, gamma: false }],},
     {symbol: "B", Z:5, r:84, c:"#00ffff",
-     isotopes: [{A:8, halfTime: 0.77, alpha: false, beta: true},
-		{A:10, halfTime: 0, alpha: false, beta: false},
-		{A:11, halfTime: 0, alpha: false, beta: false},
-		{A:12, halfTime: 0.02, alpha: false, beta: true}],},
+     isotopes: [{A:8, halfTime: 0.77, alpha: false, betaPlus: true, betaMin: false, gamma: false },
+		{A:10, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
+		{A:11, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
+		{A:12, halfTime: 0.02, alpha: false, betaPlus: false, betaMin: true, gamma: true }],},
     {symbol: "C", Z:6, r:76, c:"#ffbb00",
-     isotopes: [{A:10, halfTime: 19.2, alpha: false, beta: true},
-		{A:11, halfTime: 20.4*60, alpha: false, beta: true},
-		{A:12, halfTime: 0, alpha: false, beta: false},
-		{A:13, halfTime: 0, alpha: false, beta: false},
-		{A:14, halfTime: 5730*secondsYear, alpha: false, beta: true}],},
+     isotopes: [{A:10, halfTime: 19.2, alpha: false, betaPlus: true, betaMin: false, gamma: false },
+		{A:11, halfTime: 20.4*60, alpha: false, betaPlus: true, betaMin: false, gamma: false },
+		{A:12, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
+		{A:13, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
+		{A:14, halfTime: 5730*secondsYear, alpha: false, betaPlus: false, betaMin: true, gamma: false }],},
     {symbol: "N", Z:7, r:71, c:"#ff00bb",
-     isotopes: [{A:12, halfTime: 0.011, alpha: false, beta: true},
-		{A:13, halfTime: 9.97*60, alpha: false, beta: true},
-		{A:14, halfTime: 0, alpha: false, beta: false},
-		{A:15, halfTime: 0, alpha: false, beta: false},
-		{A:16, halfTime: 7.13, alpha: false, beta: true}],},
+     isotopes: [{A:12, halfTime: 0.011, alpha: false, betaPlus: true, betaMin: false, gamma: false },
+		{A:13, halfTime: 9.97*60, alpha: false, betaPlus: true, betaMin: false, gamma: false },
+		{A:14, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
+		{A:15, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
+		{A:16, halfTime: 7.13, alpha: false, betaPlus: false, betaMin: true, gamma: false }],},
     {symbol: "O", Z:8, r:66, c:"#bbff00",
-     isotopes: [{A:15, halfTime: 0.011, alpha: false, beta: true},
-		{A:16, halfTime: 0, alpha: false, beta: false},
-		{A:17, halfTime: 0, alpha: false, beta: false},
-		{A:18, halfTime: 0, alpha: false, beta: false},
-		{A:19, halfTime: 7.13, alpha: false, beta: true}],},
+     isotopes: [{A:15, halfTime: 0.011, alpha: false, betaPlus: true, betaMin: false, gamma: false },
+		{A:16, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
+		{A:17, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
+		{A:18, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
+		{A:19, halfTime: 7.13, alpha: false, betaPlus: false, betaMin: true, gamma: true }],},
     {symbol: "F", Z:9, r:57, c:"#00ffbb",
-     isotopes: [{A:19, halfTime: 0, alpha: false, beta: false},],},
+     isotopes: [{A:19, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },],},
     {symbol: "Ne", Z:10, r:58, c:"#bb00ff",
-     isotopes: [{A:20, halfTime: 0, alpha: false, beta: false},
-		{A:21, halfTime: 0, alpha: false, beta: false},
-		{A:22, halfTime: 0, alpha: false, beta: false},
-		{A:24, halfTime: 3.38*60, alpha: false, beta: true},],},
+     isotopes: [{A:20, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
+		{A:21, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
+		{A:22, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
+		{A:24, halfTime: 3.38*60, alpha: false, betaPlus: false, betaMin: true, gamma: true },],},
     {symbol: "Na", Z:11, r:166, c:"#ffbbbb",
-     isotopes: [{A:22, halfTime: 2.6*secondsYear, alpha: false, beta: true},
-		{A:23, halfTime: 0, alpha: false, beta: false},
-		{A:24, halfTime: 14.96*3600, alpha: false, beta: true},],},
+     isotopes: [{A:22, halfTime: 2.6*secondsYear, alpha: false, betaPlus: true, betaMin: false, gamma: true },
+		{A:23, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
+		{A:24, halfTime: 14.96*3600, alpha: false, betaPlus: false, betaMin: true, gamma: true },],},
     {symbol: "Mg", Z:12, r:141, c:"#bbffbb",
-     isotopes: [{A:22, halfTime: 3.9, alpha: false, beta: true},
-		{A:24, halfTime: 0, alpha: false, beta: false},
-		{A:25, halfTime: 0, alpha: false, beta: false},
-		{A:26, halfTime: 0, alpha: false, beta: false},
-		{A:28, halfTime: 14.96*3600, alpha: false, beta: true},],},
+     isotopes: [{A:22, halfTime: 3.9, alpha: false, betaPlus: true, betaMin: false, gamma: false },
+		{A:24, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
+		{A:25, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
+		{A:26, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
+		{A:28, halfTime: 14.96*3600, alpha: false, betaPlus: false, betaMin: true, gamma: false },],},
     {symbol: "Al", Z:13, r:121, c:"#bbbbff",
-     isotopes: [{A:26, halfTime: secondsYear*7.17e7, alpha: false, beta: true},
-		{A:27, halfTime: 0, alpha: false, beta: false},
-		{A:28, halfTime: 2.4*60, alpha: false, beta: true},],},
+     isotopes: [{A:26, halfTime: secondsYear*7.17e7, alpha: false, betaPlus: true, betaMin: false, gamma: false },
+		{A:27, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
+		{A:28, halfTime: 2.4*60, alpha: false, betaPlus: false, betaMin: true, gamma: true },],},
     {symbol: "Si", Z:14, r:111, c:"#bb0000",
-     isotopes: [{A:28, halfTime: 0, alpha: false, beta: false},
-		{A:29, halfTime: 0, alpha: false, beta: false},
-		{A:30, halfTime: 0, alpha: false, beta: false},
-		{A:31, halfTime: 2.6*3600, alpha: false, beta: true},
-		{A:32, halfTime: secondsYear*150, alpha: false, beta: true},],},
+     isotopes: [{A:28, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
+		{A:29, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
+		{A:30, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
+		{A:31, halfTime: 2.6*3600, alpha: false, betaPlus: false, betaMin: true, gamma: false },
+		{A:32, halfTime: secondsYear*150, alpha: false, betaPlus: false, betaMin: true, gamma: false },],},
     {symbol: "P", Z:15, r:107, c:"#00bb00",
-     isotopes: [{A:30, halfTime: 2.5*60, alpha: false, beta: true},
-		{A:31, halfTime: 0, alpha: false, beta: false},
-		{A:32, halfTime: 14.3*secondsDay, alpha: false, beta: true},
-		{A:33, halfTime: 25.3*secondsDay, alpha: false, beta: true},],},
+     isotopes: [{A:30, halfTime: 2.5*60, alpha: false, betaPlus: true, betaMin: false, gamma: false },
+		{A:31, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
+		{A:32, halfTime: 14.3*secondsDay, alpha: false, betaPlus: false, betaMin: true, gamma: false },
+		{A:33, halfTime: 25.3*secondsDay, alpha: false, betaPlus: false, betaMin: true, gamma: false },],},
     {symbol: "S", Z:16, r:105, c:"#bbbb00",
-     isotopes: [{A:32, halfTime: 0, alpha: false, beta: false},
-		{A:33, halfTime: 0, alpha: false, beta: false},
-		{A:34, halfTime: 0, alpha: false, beta: false},
-		{A:35, halfTime: 87.3*secondsDay, alpha: false, beta: true},
-		{A:36, halfTime: 0, alpha: false, beta: false},
-		{A:38, halfTime: 2.84*secondsDay, alpha: false, beta: true},],},
+     isotopes: [{A:32, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
+		{A:33, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
+		{A:34, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
+		{A:35, halfTime: 87.3*secondsDay, alpha: false, betaPlus: false, betaMin: true, gamma: false },
+		{A:36, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
+		{A:38, halfTime: 2.84*secondsDay, alpha: false, betaPlus: false, betaMin: true, gamma: false },],},
     {symbol: "Cl", Z:17, r:102, c:"#bb00bb",
-     isotopes: [{A:34, halfTime: 1.53, alpha: false, beta: true},
-		{A:35, halfTime: 0, alpha: false, beta: false},
-		{A:36, halfTime: secondsYear*3.01e5, alpha: false, beta: true},
-		{A:37, halfTime: 0, alpha: false, beta: false},
-		{A:38, halfTime: 37.2*60, alpha: false, beta: true},
-		{A:39, halfTime: 55.5*60, alpha: false, beta: true},],},
+     isotopes: [{A:34, halfTime: 1.53, alpha: false, betaPlus: true, betaMin: false, gamma: true },
+		{A:35, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
+		{A:36, halfTime: secondsYear*3.01e5, alpha: false, betaPlus: true, betaMin: true, gamma: false },
+		{A:37, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
+		{A:38, halfTime: 37.2*60, alpha: false, betaPlus: false, betaMin: true, gamma: true },
+		{A:39, halfTime: 55.5*60, alpha: false, betaPlus: false, betaMin: true, gamma: false },],},
     {symbol: "Ar", Z:18, r:106, c:"#00bbbb",
-     isotopes: [{A:36, halfTime: 0, alpha: false, beta: false},
-		{A:37, halfTime: 0, alpha: false, beta: false},
-		{A:38, halfTime: 0, alpha: false, beta: false},
-		{A:39, halfTime: 269*secondsDay, alpha: false, beta: true},
-		{A:40, halfTime: 0, alpha: false, beta: false},],},
+     isotopes: [{A:36, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
+		{A:37, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
+		{A:38, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
+		{A:39, halfTime: 269*secondsDay, alpha: false, betaPlus: false, betaMin: true, gamma: false },
+		{A:40, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },],},
 ];
 
 let atomSelector = {
@@ -348,7 +367,7 @@ function setup() {
     createCanvas(windowWidth, windowHeight);
     updateCenter();
     updateUIButtons();
-    textSize(16);
+    textSize(24);
     maxAtomDiamater = 2*max(width, height);
     let bounds = textBounds("W", 0, 0);
     checkBoxSize = 1.1*max(bounds.h, bounds.w);
@@ -389,6 +408,9 @@ function resetGame() {
     exponent = -10;
     scale = 1;
     atoms = [];
+    electrons = [];
+    gamma = [];
+    positrons = [];
 }
 
 function mouseClicked() {
@@ -486,7 +508,9 @@ function mouseClicked() {
 			c: atom.c,
 			halfTime: atom.isotopes[j].halfTime,
 			alpha: atom.isotopes[j].alpha,
-			beta: atom.isotopes[j].beta,
+			betaMin: atom.isotopes[j].betaMin,
+			betaPlus: atom.isotopes[j].betaPlus,
+			gamma: atom.isotopes[j].gamma,
 		    };
 
 		    console.log("clicked: (%d, %d)", i, j);
@@ -547,7 +571,9 @@ function mouseClicked() {
 	c: currentAtom.c,
 	halfTime: currentAtom.halfTime,
 	alpha: currentAtom.alpha,
-	beta: currentAtom.beta,
+	betaMin: currentAtom.betaMin,
+	betaPlus: currentAtom.betaPlus,
+	gamma: currentAtom.gamma,
 	x: (mouseX - centerX) * (scale*10**exponent) / stepSize,
 	y: (centerY - mouseY) * (scale*10**exponent) / stepSize,
 	vx: 0,
@@ -582,7 +608,7 @@ function mouseWheel(event) {
     let oldPixelsPerUnit = stepSize / (scale*10**exponent);
 
     if (exponent < 3 && event.delta > 0) { scale *= 2};
-    if (exponent > -12 && event.delta < 0) { scale /= 2};
+    if (exponent > -15 && event.delta < 0) { scale /= 2};
     if (scale <= 0) { scale = 0.1; }
     if (scale >= 10) { scale /= 10; exponent += 1; }
     if (scale < 0.1) { scale *= 10; exponent -= 1; }
@@ -638,7 +664,7 @@ function bounce(atomA, atomB) {
     let distance = dist(atomA.x , atomA.y, atomB.x, atomB.y);
     let u = atomA.r + atomB.r - distance;
 
-    if (distance === 0) { return; }
+    if (distance === 0) return;
     let massA = (atomA.A * physicsConstants.atomicMass);
     let massB = (atomB.A * physicsConstants.atomicMass);
     let nx = dx / distance;
@@ -648,6 +674,118 @@ function bounce(atomA, atomB) {
     atomB.ax += physicsConstants.spring * u / massB * nx;
     atomA.ax -= physicsConstants.spring * u / massA * nx;
     atomA.ay -= physicsConstants.spring * u / massA * ny;
+}
+
+function updateDecayedAtom(atom) {
+    const element = periodicTable[atom.Z - 1];
+
+    if (!element) {
+        console.warn(`Missing element data for Z = ${atom.Z}`);
+        atom.halfTime = 0;
+        atom.alpha = false;
+	atom.betaMin = false;
+	atom.betaPlus = false;
+	atom.gamma = false;
+        return false;
+    }
+
+    const isotope = element.isotopes.find(isotope => isotope.A === atom.A);
+    if (!isotope) {
+        console.log("Missing isotope for " + element.symbol);
+        atom.halfTime = 0;
+        atom.alpha = false;
+	atom.betaMin = false;
+	atom.betaPlus = false;
+	atom.gamma = false;
+        return false;
+    }
+
+    atom.symbol = element.symbol;
+    atom.r = element.r * 1e-12;
+    atom.c = element.c;
+    atom.halfTime = isotope.halfTime;
+    atom.alpha = isotope.alpha;
+    atom.betaMin = isotope.betaMin;
+    atom.betaPlus = isotope.betaPlus;
+    atom.gamma = isotope.gamma;
+    return true;
+}
+
+function spawnGamma(atom) {
+    let randAngle = random(0, 2*PI);
+    gamma.push({
+	vx: physicsSettings.gammaSpeedMultiplier*physicsConstants.C*cos(randAngle),
+	vy: physicsSettings.gammaSpeedMultiplier*physicsConstants.C*sin(randAngle),
+	angle: randAngle,
+	x: atom.x,
+	y: atom.y,
+	lambda: 10 * 1e-12,
+    });
+}
+
+function processDecay(dt) {
+    for (let i = 0; i < atoms.length; i++) {
+	let atom = atoms[i];
+	if (atom.halfTime === 0) continue;
+
+	if (Math.random() < 1 - (0.5**(dt/atom.halfTime))) {
+	    let randSpeed = random(0, 0.05*physicsConstants.C);
+	    let randAngle = random(0, 2*PI);
+	    if (atom.alpha) {
+		atom.A -= 4;
+		atom.Z -= 2;
+		atoms.push({
+		    A: 4,
+		    Z: 2,
+		    alpha: false,
+		    beta: false,
+		    halfTime: 0,
+		    r: 28 * 1e-12,
+		    c: "#00ff00",
+		    symbol: "He",
+		    vx: atom.vx + physicsSettings.alphaSpeedMultiplier*randSpeed*sin(randAngle),
+		    vy: atom.vy + physicsSettings.alphaSpeedMultiplier*randSpeed*cos(randAngle),
+		    ay: 0,
+		    ax: 0,
+		    x: atom.x,
+		    y: atom.y,
+		});
+
+		console.log(randSpeed*sin(randAngle));
+		if (atom.gamma) spawnGamma(atom);
+		updateDecayedAtom(atom);
+	    } else if (atom.betaMin) {
+		atom.Z += 1;
+		electrons.push({
+		    x: atom.x,
+		    y: atom.y,
+		    vx: atom.vx + physicsSettings.betaSpeedMultiplier*randSpeed*sin(randAngle),
+		    vy: atom.vy + physicsSettings.betaSpeedMultiplier*randSpeed*cos(randAngle),
+		    ay: 0,
+		    ax: 0,
+		});
+
+		if (atom.gamma) spawnGamma(atom);
+		updateDecayedAtom(atom);
+	    } else if (atom.betaPlus) {
+		atom.Z -= 1;
+		positrons.push({
+		    x: atom.x,
+		    y: atom.y,
+		    vx: atom.vx + physicsSettings.betaSpeedMultiplier*randSpeed*sin(randAngle),
+		    vy: atom.vy + physicsSettings.betaSpeedMultiplier*randSpeed*cos(randAngle),
+		    ay: 0,
+		    ax: 0,
+		});
+
+		if (atom.gamma) spawnGamma(atom);
+		updateDecayedAtom(atom);
+	    } else {
+		console.log("BUG: the following atom decay type was unknown:");
+		console.log(atom);
+	    }
+	}
+    }
 }
 
 function processPhysics() {
@@ -660,6 +798,11 @@ function processPhysics() {
     //gravity
     if (physicsOptions.checkBoxes[0].value) {
 	processGravity(dt);
+    }
+
+    // Radioactive decay.
+    if (physicsOptions.checkBoxes[4].value) {
+	processDecay(dt);
     }
 
     //bounce
@@ -677,6 +820,25 @@ function processPhysics() {
 
     // movement
     if (physicsOptions.checkBoxes[2].value) {
+	for (let i = 0; i < electrons.length; i++) {
+	    electrons[i].vx += electrons[i].ax * dt;
+	    electrons[i].vy += electrons[i].ay * dt;
+	    electrons[i].x += electrons[i].vx * dt;
+	    electrons[i].y += electrons[i].vy * dt;
+	}
+
+	for (let i = 0; i < positrons.length; i++) {
+	    positrons[i].vx += positrons[i].ax * dt;
+	    positrons[i].vy += positrons[i].ay * dt;
+	    positrons[i].x += positrons[i].vx * dt;
+	    positrons[i].y += positrons[i].vy * dt;
+	}
+
+	for (let i = 0; i < gamma.length; i++) {
+	    gamma[i].x += gamma[i].vx * dt;
+	    gamma[i].y += gamma[i].vy * dt;
+	}
+
 	for (let i = 0; i < atoms.length; i++) {
 	    atoms[i].vx += atoms[i].ax * dt;
 	    atoms[i].vy += atoms[i].ay * dt;
@@ -687,6 +849,7 @@ function processPhysics() {
 }
 
 function getUnit() {
+    if (exponent > -18 && exponent <= -15) { return "pm"; }
     if (exponent > -15 && exponent <= -12) { return "pm"; }
     if (exponent > -12 && exponent <= -9) { return "nm"; }
     if (exponent > -9 && exponent <= -6) { return "μm"; }
@@ -1188,6 +1351,101 @@ function drawInstructionsMenu() {
     }
 }
 
+function drawElectrons() {
+    for (let i = 0; i < electrons.length; i++) {
+	let x = centerX + electrons[i].x / (scale*10**exponent) * stepSize;
+	let y = centerY - electrons[i].y / (scale*10**exponent) * stepSize;
+	let d = constrain(2*physicsConstants.elektronRadius * stepSize/(scale*10**exponent), minAtomDiamater, maxAtomDiamater);
+
+	if (x + d/2 < 0 ||
+	    x - d/2 > width ||
+	    y + d/2 < 0 ||
+	    y - d/2 > height) continue;
+
+	fill(255,0,0);
+	circle(x, y, d);
+	let name = "e-";
+	let size = 16;
+	while (true) {
+	    textSize(size);
+	    let bounds = textBounds(name, x, y);
+	    let txtR = sqrt(bounds.w*bounds.w + bounds.h*bounds.h);
+	    if (txtR > d * 0.8) {
+		size -= 1;
+	    }
+
+	    if (size <= 4 || txtR <= d * 0.8) {
+		break;
+	    }
+	}
+
+	if (size > 4) {
+	    textSize(size);
+	    fill(0);
+	    let bounds = textBounds(name, x, y);
+	    text(name, x - bounds.w/2, y+bounds.h/2);
+	}
+    }
+}
+
+function drawPositrons() {
+    for (let i = 0; i < positrons.length; i++) {
+	let x = centerX + positrons[i].x / (scale*10**exponent) * stepSize;
+	let y = centerY - positrons[i].y / (scale*10**exponent) * stepSize;
+	let d = constrain(2*physicsConstants.elektronRadius * stepSize/(scale*10**exponent), minAtomDiamater, maxAtomDiamater);
+
+	if (x + d/2 < 0 ||
+	    x - d/2 > width ||
+	    y + d/2 < 0 ||
+	    y - d/2 > height) continue;
+
+	fill(255,0,0);
+	circle(x, y, d);
+	let name = "e+";
+	let size = 16;
+	while (true) {
+	    textSize(size);
+	    let bounds = textBounds(name, x, y);
+	    let txtR = sqrt(bounds.w*bounds.w + bounds.h*bounds.h);
+	    if (txtR > d * 0.8) {
+		size -= 1;
+	    }
+
+	    if (size <= 4 || txtR <= d * 0.8) {
+		break;
+	    }
+	}
+
+	if (size > 4) {
+	    textSize(size);
+	    fill(0);
+	    let bounds = textBounds(name, x, y);
+	    text(name, x - bounds.w/2, y+bounds.h/2);
+	}
+    }
+}
+
+function drawGamma() {
+    for (let i = 0; i < gamma.length; i++) {
+	let x = centerX + gamma[i].x / (scale*10**exponent) * stepSize;
+	let y = centerY - gamma[i].y / (scale*10**exponent) * stepSize;
+
+	let lineLength = gamma[i].lambda / (scale*10**exponent) * stepSize;
+	let dx = cos(gamma[i].angle) * lineLength/2;
+        let dy = -sin(gamma[i].angle) * lineLength/2;
+
+        if (x < -lineLength ||
+	    x > width + lineLength ||
+	    y < -lineLength ||
+	    y > height + lineLength)  continue;
+
+	stroke(127);
+	strokeWeight(3);
+	line(x-dx, y-dy, x+dx, y+dy);
+	strokeWeight(1);
+    }
+}
+
 function draw() {
     background("#EBDBB2");
     fill(128, 255, 128);
@@ -1195,6 +1453,9 @@ function draw() {
     if (!paused && !homeMenu.open && !instructionsMenu.open) processPhysics();
     drawCoordinatePlane();
     drawAtoms();
+    drawElectrons();
+    drawPositrons();
+    drawGamma();
     if (!homeMenu.open && !instructionsMenu.open) drawHud();
     if (homeMenu.open) drawHomeMenu();
     if (instructionsMenu.open) drawInstructionsMenu();
