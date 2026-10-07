@@ -21,8 +21,26 @@ let physicsSettings = {
     softeningConst: 2,
 };
 
+let instructionsMenu = {
+    open: false,
+    title: {
+	label: "Instructions",
+	x: 0,
+	y: 0,
+	w: 0,
+	h: 0,
+    },
+    button: {
+	label: "back",
+	    x: 0,
+	    y: 0,
+	    w: 0,
+	    h: 0,
+    },
+}
+
 let paused = false;
-let home = {
+let homeMenu = {
     open: true,
     title: {
 	label: "Phychem-ulator",
@@ -234,8 +252,6 @@ let cursor = { x: 0, y: 0, };
 let cursorSpeed = 50;
 let padding = 5;
 let dragging = false;
-let instructionsOpen = false;
-
 let bar = {
     x: 0,
     w: 0,
@@ -376,15 +392,39 @@ function resetGame() {
 }
 
 function mouseClicked() {
-    if (home.open) {
-	if (mouseX > home.buttons[0].x - 6*padding - home.buttons[0].h/2 &&
-	    mouseX < home.buttons[0].x + home.buttons[0].w -6*padding + home.buttons[0].h/2 &&
-	    mouseY > home.buttons[0].y - home.buttons[0].h + 3*padding &&
-	    mouseY < home.buttons[0].y + 3*padding) {
-	    home.open = false;
+    if (homeMenu.open) {
+	if (mouseX > homeMenu.buttons[0].x - homeMenu.buttons[0].h/2 &&
+	    mouseX < homeMenu.buttons[0].x + homeMenu.buttons[0].w + homeMenu.buttons[0].h/2 &&
+	    mouseY > homeMenu.buttons[0].y - homeMenu.buttons[0].h + 3*padding &&
+	    mouseY < homeMenu.buttons[0].y + 3*padding) {
+	    homeMenu.open = false;
+	    console.log("Closed homeMenu");
 	    return;
 	}
 
+	if (mouseX > homeMenu.buttons[1].x - homeMenu.buttons[1].h/2 &&
+	    mouseX < homeMenu.buttons[1].x + homeMenu.buttons[1].w + homeMenu.buttons[1].h/2 &&
+	    mouseY > homeMenu.buttons[1].y - homeMenu.buttons[1].h + 3*padding &&
+	    mouseY < homeMenu.buttons[1].y + 3*padding) {
+	    homeMenu.open = false;
+	    instructionsMenu.open = true;
+	    console.log("Opened instructionsmenu");
+	    return;
+	}
+
+	return;
+    }
+
+    if (instructionsMenu.open) {
+	if (mouseX > instructionsMenu.button.x- instructionsMenu.button.h/2 &&
+	    mouseX < instructionsMenu.button.x + instructionsMenu.button.w + instructionsMenu.button.h/2 &&
+	    mouseY > instructionsMenu.button.y -instructionsMenu.button.h + 3*padding &&
+	    mouseY < instructionsMenu.button.y + 3*padding) {
+	    homeMenu.open = true;
+	    instructionsMenu.open = false;
+	    console.log("Opened homeMenu");
+	    return;
+	}
 	return;
     }
 
@@ -422,7 +462,7 @@ function mouseClicked() {
 	    return;
 	}
 
-	let x = atomSelector.x + padding;
+	let x = atomSelector.x + 3*padding;
 	let y = UIButtons[3].y + 3 * padding + lineSize;
 	let totalIndex = 0;
 	let placed = 0;
@@ -444,19 +484,19 @@ function mouseClicked() {
 			Z: atom.Z,
 			r: atom.r,
 			c: atom.c,
-			    halfTime: atom.isotopes[j].halfTime,
-			    alpha: atom.isotopes[j].alpha,
-			    beta: atom.isotopes[j].beta,
-			};
+			halfTime: atom.isotopes[j].halfTime,
+			alpha: atom.isotopes[j].alpha,
+			beta: atom.isotopes[j].beta,
+		    };
 
-			console.log("clicked: (%d, %d)", i, j);
-			atomSelector.open = false;
-			return;
-		    }
+		    console.log("clicked: (%d, %d)", i, j);
+		    atomSelector.open = false;
+		    return;
+		}
 
 		if (placed%atomSelector.columns === 0) {
 		    y += atomSelector.size;
-		    x = atomSelector.x + padding;
+		    x = atomSelector.x + 3*padding;
 		} else {
 		    x += atomSelector.size;
 		}
@@ -479,12 +519,19 @@ function mouseClicked() {
 	if (isMouseOverButton(UIButtons, 1)) {
 	    console.log("clicked button 1 (pause/unpause)");
 	    paused = !paused;
+	    if (paused) {
+		UIButtons[1].label = "Resume";
+	    } else {
+		UIButtons[1].label = "Pause";
+	    }
+
+	    updateUIButton(1);
 	    return;
 	}
 
 	if (isMouseOverButton(UIButtons, 0)) {
-	    console.log("clicked button 0 (home)");
-	    home.open = true;
+	    console.log("clicked button 0 (homeMenu)");
+	    homeMenu.open = true;
 	    return;
 	}
 
@@ -513,6 +560,12 @@ function mouseClicked() {
 }
 
 function mouseWheel(event) {
+    if (homeMenu.open) return false;
+    if (instructionsMenu.open) {
+
+	return false;
+    }
+
     if (mouseX > atomSelector.x &&
 	mouseX < atomSelector.x + atomSelector.w &&
 	mouseY > atomSelector.y &&
@@ -647,7 +700,8 @@ function getUnit() {
 }
 
 function mouseDragged() {
-    if (home.open) { return; }
+    if (homeMenu.open) { return; }
+    if (instructionsMenu.open) { return; }
     cursor.x += mouseX - pmouseX;
     cursor.y += mouseY - pmouseY;
     centerY = offset.y + cursor.y;
@@ -656,7 +710,7 @@ function mouseDragged() {
 }
 
 function keyTyped() {
-    if (home.open) { return; }
+    if (homeMenu.open) { return; }
     if (key === 'r') {
 	resetGame();
     }
@@ -667,8 +721,8 @@ function keyTyped() {
 }
 
 function handleKeys() {
-    if (keyIsDown(RETURN)) home.open = false;
-    if (home.open) { return; }
+    if (keyIsDown(RETURN)) homeMenu.open = false;
+    if (homeMenu.open) { return; }
 
     let panStep = cursorSpeed * deltaTime / 1000;
     if (keyIsDown('ArrowLeft') || keyIsDown('a')) {
@@ -777,13 +831,8 @@ function drawAtoms() {
 function drawStatusBar() {
     textSize(24);
     noStroke();
-    if (paused) {
-	UIButtons[1].label = "Resume";
-    } else {
-	UIButtons[1].label = "Pause";
-    }
 
-    let scaleStatus = "scale = 1:" + (scale*10**exponent).toExponential(2);
+    let scaleStatus = "scale = " + scale.toFixed(2) + getUnit();
     let atomStatus = "atoms = " + atoms.length;
     let fpsStatus = "fps = " + Math.round(frameRate());
 
@@ -791,37 +840,24 @@ function drawStatusBar() {
     let atomBounds = textBounds(atomStatus, width/2, 0);
     let fpsBounds = textBounds(fpsStatus, width/2, 0);
 
-    // recompute new bar.
     bar.h = UIButtons[0].h + 2*padding;
     bar.w = UIButtons[0].w + scaleBounds.w + atomBounds.w + fpsBounds.w + UIButtons[1].w + UIButtons[2].w + 10*padding;
     bar.x = UIButtons[0].x - scaleBounds.w - 4*padding - UIButtons[1].w;
+    let statusY = bar.y + bar.h / 2;
 
-    // draw bar
     fill("#32302F");
     rect(bar.x, bar.y, bar.w, bar.h);
     circle(bar.x, bar.h/2 + bar.y, bar.h);
     circle(bar.x+bar.w, bar.h/2 + bar.y, bar.h);
-
     fill("#EBDBB2");
-    text(scaleStatus, bar.x, bar.y + scaleBounds.h + padding);
-    text(atomStatus, UIButtons[2].x + UIButtons[2].w + 2*padding, bar.y + atomBounds.h + padding);
-    text(fpsStatus, UIButtons[2].x + UIButtons[2].w+atomBounds.w+4*padding, bar.y + atomBounds.h + padding);
+
+    textAlign(LEFT, CENTER);
+    text(scaleStatus, bar.x, statusY);
+    text(atomStatus, UIButtons[2].x + UIButtons[2].w + 2 * padding, statusY);
+    text(fpsStatus, UIButtons[2].x + UIButtons[2].w + atomBounds.w + 4 * padding, statusY);
+    textAlign(LEFT, BASELINE);
     drawButton(UIButtons, 0);
     drawButton(UIButtons, 1);
-    drawButton(UIButtons, 2);
-}
-
-function drawPaused() {
-    let button = UIButtons[2];
-
-
-    fill("#32302F");
-    stroke(255);
-    rect(button.x - padding/2, button.y - button.h + padding/2, button.w, button.h);
-    circle(button.x - padding/2, button.y - button.h/2 + padding/2, button.h);
-    circle(button.x + button.w, button.y - button.h/2 + padding/2, button.h);
-    stroke(0);
-    fill("#EBDBB2");
     drawButton(UIButtons, 2);
 }
 
@@ -905,16 +941,16 @@ function drawAtomSelectorOpen() {
 
     let button = UIButtons[3];
     let heading = button.h + 4*padding + lineSize
-    atomSelector.max = floor((height - heading)/atomSelector.size) * atomSelector.columns;
-    atomSelector.h = heading + Math.ceil(min(atomSelector.count, atomSelector.max)/atomSelector.columns) * atomSelector.size;
-    atomSelector.w = max(button.w + button.h, atomSelector.columns*atomSelector.size) + 2*padding;
+    atomSelector.max = floor((height - heading - 4*padding)/atomSelector.size) * atomSelector.columns;
+    atomSelector.h = heading + 4*padding + Math.ceil(min(atomSelector.count, atomSelector.max)/atomSelector.columns) * atomSelector.size;
+    atomSelector.w = max(button.w + button.h, atomSelector.columns*atomSelector.size) + 6*padding;
     atomSelector.x = width - atomSelector.w - 2*padding - button.h/2;
     atomSelector.y = button.y - button.h;
     rect(atomSelector.x, atomSelector.y, atomSelector.w, atomSelector.h, 10);
     fill(127);
-    rect(atomSelector.x + padding/2, button.y + 2 * padding - lineSize/2, atomSelector.columns*atomSelector.size, lineSize);
+    rect(atomSelector.x + 3*padding, button.y + 2 * padding - lineSize/2, atomSelector.columns*atomSelector.size, lineSize);
 
-    let x = atomSelector.x + padding;
+    let x = atomSelector.x + 3*padding;
     let y = button.y + 3 * padding + lineSize;
     let totalIndex = 0;
     let placed = 0;
@@ -935,7 +971,7 @@ function drawAtomSelectorOpen() {
 
 	    if (placed%atomSelector.columns === 0) {
 		y += atomSelector.size;
-		x = atomSelector.x + padding;
+		x = atomSelector.x + 3*padding;
 	    } else {
 		x += atomSelector.size;
 	    }
@@ -971,54 +1007,54 @@ function drawHud() {
     drawAtomSelector();
 }
 
-function drawHome() {
+function drawHomeMenu() {
     fill("#EBDBB2BB");
     rect(0, 0, width,height);
     textSize(48);
     noStroke();
 
-    let titleBounds = textBounds(home.title.label, 0, 0);
+    let titleBounds = textBounds(homeMenu.title.label, 0, 0);
     textSize(32);
-    let startBounds = textBounds(home.buttons[0].label, 0, 0);
-    let instructionsBounds = textBounds(home.buttons[1].label, 0, 0);
+    let startBounds = textBounds(homeMenu.buttons[0].label, 0, 0);
+    let instructionsBounds = textBounds(homeMenu.buttons[1].label, 0, 0);
 
     let totalHeight = titleBounds.h + 6*padding + startBounds.h + 6*padding + instructionsBounds.h + 6*padding + 2*3*padding;
 
-    home.title.w = titleBounds.w + 6*padding + titleBounds.h;
-    home.title.h = titleBounds.h + 6*padding;
-    home.title.x = width/2 - home.title.w/2;
-    home.title.y = height/2 - totalHeight/2;
+    homeMenu.title.w = titleBounds.w + 6*padding + titleBounds.h;
+    homeMenu.title.h = titleBounds.h + 6*padding;
+    homeMenu.title.x = width/2 - homeMenu.title.w/2;
+    homeMenu.title.y = height/2 - totalHeight/2;
 
-    home.buttons[0].w = startBounds.w + 6*padding + startBounds.h;
-    home.buttons[0].h = startBounds.h + 6*padding;
-    home.buttons[0].x = width/2 - home.buttons[0].w/2;
-    home.buttons[0].y = home.title.y + home.title.h + 2*padding;
+    homeMenu.buttons[0].w = startBounds.w + 6*padding + startBounds.h;
+    homeMenu.buttons[0].h = startBounds.h + 6*padding;
+    homeMenu.buttons[0].x = width/2 - homeMenu.buttons[0].w/2;
+    homeMenu.buttons[0].y = homeMenu.title.y + homeMenu.title.h + 2*padding;
 
-    home.buttons[1].w = instructionsBounds.w + 6*padding + instructionsBounds.h;
-    home.buttons[1].h = instructionsBounds.h + 6*padding;
-    home.buttons[1].x = width/2 - home.buttons[1].w/2;
-    home.buttons[1].y = home.buttons[0].y + home.buttons[0].h + 2*padding;
+    homeMenu.buttons[1].w = instructionsBounds.w + 6*padding + instructionsBounds.h;
+    homeMenu.buttons[1].h = instructionsBounds.h + 6*padding;
+    homeMenu.buttons[1].x = width/2 - homeMenu.buttons[1].w/2;
+    homeMenu.buttons[1].y = homeMenu.buttons[0].y + homeMenu.buttons[0].h + 2*padding;
 
     fill("#32302F");
-    rect(home.title.x - 6*padding, home.title.y - home.title.h + 3* padding, home.title.w, home.title.h);
-    circle(home.title.x - 6*padding, home.title.y - home.title.h/2 + 3*padding, home.title.h);
-    circle(home.title.x + home.title.w - 6*padding, home.title.y - home.title.h/2 + 3*padding, home.title.h);
+    rect(homeMenu.title.x, homeMenu.title.y - homeMenu.title.h + 3* padding, homeMenu.title.w, homeMenu.title.h);
+    circle(homeMenu.title.x, homeMenu.title.y - homeMenu.title.h/2 + 3*padding, homeMenu.title.h);
+    circle(homeMenu.title.x + homeMenu.title.w, homeMenu.title.y - homeMenu.title.h/2 + 3*padding, homeMenu.title.h);
     fill("#EBDBB2");
     textSize(48);
     fill("#CC241D");
-    text(home.title.label, home.title.x, home.title.y-1.5*padding);
+    text(homeMenu.title.label, homeMenu.title.x + 6*padding, homeMenu.title.y-1.5*padding);
 
     textSize(32);
     noStroke();
-    for (let i = 0; i < home.buttons.length; i++) {
+    for (let i = 0; i < homeMenu.buttons.length; i++) {
 	fill("#32302F");
-	let button = home.buttons[i];
-	rect(button.x - 6*padding, button.y - button.h + 3* padding, button.w, button.h);
-	circle(button.x - 6*padding, button.y - button.h/2 + 3*padding, button.h);
-	circle(button.x + button.w - 6*padding, button.y - button.h/2 + 3*padding, button.h);
+	let button = homeMenu.buttons[i];
+	rect(button.x, button.y - button.h + 3* padding, button.w, button.h);
+	circle(button.x, button.y - button.h/2 + 3*padding, button.h);
+	circle(button.x + button.w, button.y - button.h/2 + 3*padding, button.h);
 	fill("#EBDBB2");
-	if (mouseX > button.x - 6*padding - button.h/2 &&
-	    mouseX < button.x + button.w -6*padding + button.h/2 &&
+	if (mouseX > button.x - button.h/2 &&
+	    mouseX < button.x + button.w + button.h/2 &&
 	    mouseY > button.y -button.h + 3*padding &&
 	    mouseY < button.y + 3*padding) {
 	    fill("#98971A");
@@ -1026,7 +1062,95 @@ function drawHome() {
 	    fill("#EBDBB2");
 	}
 
-	text(button.label, button.x, button.y-padding);
+	text(button.label, button.x + 6*padding, button.y);
+    }
+}
+
+function drawInstructionsMenu() {
+    fill("#EBDBB2BB");
+    rect(0, 0, width,height);
+    noStroke();
+
+    let instructionText = [
+	"Buttons:",
+	"On the left of your screen there is a menu with settings for the physics engine.",
+	"On the right of your screen there is a menu where you can select the atom you're placing.",
+	"In the middle of your screen there are three buttons:",
+	"A pause/resume button, which pauses/resumes the simulation.",
+	"A Home button, which brings you to the main menu.",
+	"And finally a reset button, which reset the simulation, but not your settings.",
+	"",
+	"Move around by:",
+	"- Dragging the coordinateplane whiles holding down the left mouse button.",
+	"- By using the W-, A-, S-, and D-keys.",
+	"- By using the Arrow-keys.",
+	"",
+	"Place atoms by clicking with your left mouse button."
+    ];
+
+    let textHeight = 0;
+    let textWidth = 0;
+    textSize(16);
+    for (let i = 0; i < instructionText.length; i++) {
+	let bounds = textBounds(instructionText[i], 0, 0);
+	textHeight += bounds.h + padding;
+	textWidth = max(textWidth, bounds.w);
+    }
+
+    textSize(48);
+    let titleBounds = textBounds(instructionsMenu.title.label, 0, 0);
+    textSize(32);
+    let startBounds = textBounds(instructionsMenu.button.label, 0, 0);
+    let instructionsBounds = textBounds(instructionsMenu.button.label, 0, 0);
+    let totalHeight = titleBounds.h + 6*padding + startBounds.h + 6*padding + instructionsBounds.h + 6*padding + 2*3*padding + textHeight;
+
+    instructionsMenu.title.w = titleBounds.w + 6*padding + titleBounds.h;
+    instructionsMenu.title.h = titleBounds.h + 6*padding;
+    instructionsMenu.title.x = width/2 - instructionsMenu.title.w/2;
+    instructionsMenu.title.y = height/2 - totalHeight/2;
+
+    instructionsMenu.button.w = startBounds.w + 6*padding + startBounds.h;
+    instructionsMenu.button.h = startBounds.h + 6*padding;
+    instructionsMenu.button.x = width/2 - instructionsMenu.button.w/2;
+    instructionsMenu.button.y = instructionsMenu.title.y + instructionsMenu.title.h + 2*padding;
+
+    fill("#32302F");
+    rect(instructionsMenu.title.x, instructionsMenu.title.y - instructionsMenu.title.h + 3* padding, instructionsMenu.title.w, instructionsMenu.title.h);
+    circle(instructionsMenu.title.x, instructionsMenu.title.y - instructionsMenu.title.h/2 + 3*padding, instructionsMenu.title.h);
+    circle(instructionsMenu.title.x + instructionsMenu.title.w, instructionsMenu.title.y - instructionsMenu.title.h/2 + 3*padding, instructionsMenu.title.h);
+    fill("#EBDBB2");
+    textSize(48);
+    fill("#CC241D");
+    text(instructionsMenu.title.label, instructionsMenu.title.x + 6*padding, instructionsMenu.title.y-1.5*padding);
+
+    textSize(32);
+    fill("#32302F");
+    rect(instructionsMenu.button.x, instructionsMenu.button.y - instructionsMenu.button.h + 3* padding, instructionsMenu.button.w, instructionsMenu.button.h);
+    circle(instructionsMenu.button.x, instructionsMenu.button.y - instructionsMenu.button.h/2 + 3*padding, instructionsMenu.button.h);
+    circle(instructionsMenu.button.x + instructionsMenu.button.w, instructionsMenu.button.y - instructionsMenu.button.h/2 + 3*padding, instructionsMenu.button.h);
+    fill("#EBDBB2");
+    if (mouseX > instructionsMenu.button.x- instructionsMenu.button.h/2 &&
+	mouseX < instructionsMenu.button.x + instructionsMenu.button.w + instructionsMenu.button.h/2 &&
+	mouseY > instructionsMenu.button.y -instructionsMenu.button.h + 3*padding &&
+	mouseY < instructionsMenu.button.y + 3*padding) {
+	fill("#98971A");
+    } else {
+	fill("#EBDBB2");
+    }
+
+    text(instructionsMenu.button.label, instructionsMenu.button.x + 6*padding, instructionsMenu.button.y);
+
+    textSize(16);
+    fill("#32302F");
+    let x = width/2 - textWidth/2;
+    let y = instructionsMenu.button.y + 12*padding;
+    rect(x-padding, y-padding, textWidth+2*padding,textHeight+2*padding);
+
+    fill("#EBDBB2");
+    for (let i = 0; i < instructionText.length; i++) {
+	let bounds = textBounds(instructionText[i], 0, 0);
+	y += bounds.h + padding;
+	text(instructionText[i], x, y);
     }
 }
 
@@ -1034,9 +1158,10 @@ function draw() {
     background("#EBDBB2");
     fill(128, 255, 128);
     handleKeys();
-    if (!paused && !home.open && !instructionsOpen) processPhysics();
+    if (!paused && !homeMenu.open && !instructionsMenu.open) processPhysics();
     drawCoordinatePlane();
     drawAtoms();
-    if (!home.open && !instructionsOpen) drawHud();
-    if (home.open) drawHome();
+    if (!homeMenu.open && !instructionsMenu.open) drawHud();
+    if (homeMenu.open) drawHomeMenu();
+    if (instructionsMenu.open) drawInstructionsMenu();
 }
