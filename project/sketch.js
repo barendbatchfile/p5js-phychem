@@ -22,6 +22,33 @@ let physicsSettings = {
 };
 
 let paused = false;
+let home = {
+    open: true,
+    title: {
+	label: "Phychem-ulator",
+	x: 0,
+	y: 0,
+	w: 0,
+	h: 0,
+    },
+    buttons: [
+	{
+	    label: "Start/continue",
+	    x: 0,
+	    y: 0,
+	    w: 0,
+	    h: 0,
+	},
+	{
+	    label: "Instructions",
+	    x: 0,
+	    y: 0,
+	    w: 0,
+	    h: 0,
+	},
+    ],
+};
+
 let physicsOptions = {
     h: 0,
     w: 0,
@@ -181,7 +208,7 @@ let periodicTable = [
 let atomSelector = {
     size: 0,
     open: false,
-    columns: 4,
+    columns: 3,
     count: 0,
     scroll: 0,
     max: 0,
@@ -194,7 +221,6 @@ let atomSelector = {
 let atoms = [];
 let minAtomDiamater = 5;
 let maxAtomDiamater = 0;
-let showWelcome = true;
 let checkBoxSize = 0;
 let lineSize = 2;
 let exponent = 0;
@@ -208,6 +234,7 @@ let cursor = { x: 0, y: 0, };
 let cursorSpeed = 50;
 let padding = 5;
 let dragging = false;
+let instructionsOpen = false;
 
 let bar = {
     x: 0,
@@ -216,16 +243,9 @@ let bar = {
     y: 2 * padding,
 }
 
-let buttons = [
+let UIButtons = [
     {
-	label: "Reset",
-	x: 0,
-	y: 0,
-	w: 0,
-	h: 0,
-    },
-    {
-	label: "Settings",
+	label: "Home",
 	x: 0,
 	y: 0,
 	w: 0,
@@ -239,6 +259,13 @@ let buttons = [
 	h: 0,
     },
     {
+	label: "Reset",
+	x: 0,
+	y: 0,
+	w: 0,
+	h: 0,
+    },
+    {
 	label: "Select atom",
 	x: 0,
 	y: 0,
@@ -246,7 +273,7 @@ let buttons = [
 	h: 0,
     },
     {
-	label: "Help",
+	label: "Settings",
 	x: 0,
 	y: 0,
 	w: 0,
@@ -254,38 +281,43 @@ let buttons = [
     },
 ];
 
-function updateButton(id) {
-    textSize(16);
-    let bounds = textBounds(buttons[id].label, width/2, id);
+function updateUIButton(id) {
+    textSize(24);
+    let bounds = textBounds(UIButtons[id].label, width/2, id);
     if (id === 0) {
-	buttons[id].w = bounds.w;
-	buttons[id].h = bounds.h;
-	buttons[id].x = width/2 - buttons[id].w - padding;
-	buttons[id].y = 3*padding + buttons[id].h;
+	UIButtons[id].h = bounds.h;
+	UIButtons[id].w = bounds.w;
+	UIButtons[id].x = width/2 - bounds.w/2;
+	UIButtons[id].y = 3*padding + UIButtons[id].h;
     } else if (id === 1) {
-	buttons[id].w = bounds.w;
-	buttons[id].h = bounds.h;
-	buttons[id].y = 2*padding + buttons[id].h;
-	buttons[id].x = padding + buttons[id].h;
+	UIButtons[id].h = bounds.h;
+	UIButtons[id].w = bounds.w;
+	UIButtons[id].x = UIButtons[0].x - UIButtons[id].w - 2*padding;
+	UIButtons[id].y = 3*padding + UIButtons[id].h - textDescent(UIButtons[id].label);
+    } else if (id === 2) {
+	UIButtons[id].h = bounds.h;
+	UIButtons[id].w = bounds.w + padding;
+	UIButtons[id].x = UIButtons[0].x + UIButtons[0].w + 2*padding;
+	UIButtons[id].y = 3*padding + UIButtons[id].h;
     } else if (id === 3) {
-	buttons[id].w = bounds.w;
-	buttons[id].h = bounds.h + padding;
-	buttons[id].y = 2*padding + buttons[id].h;
-	buttons[id].x = width - 3*padding - buttons[id].w - buttons[id].h;
+	UIButtons[id].w = bounds.w;
+	UIButtons[id].h = bounds.h + padding;
+	UIButtons[id].x = width - 3*padding - UIButtons[id].w - UIButtons[id].h;
+	UIButtons[id].y = 2*padding + UIButtons[id].h;
 
 	bounds = textBounds("WW-WWW", 0, 0);
 	atomSelector.size = max(bounds.h, bounds.w);
     } else if (id === 4) {
-	buttons[id].w = bounds.w;
-	buttons[id].h = bounds.h;
-	buttons[id].x = width/2 + padding;
-	buttons[id].y = 3*padding + buttons[id].h - textDescent(buttons[id].label);
+	UIButtons[id].h = bounds.h;
+	UIButtons[id].w = bounds.w;
+	UIButtons[id].x = 2*padding+ UIButtons[id].h + padding;
+	UIButtons[id].y = 3*padding + UIButtons[id].h;
     }
 }
 
-function updateButtons() {
-    for (let i = 0; i < buttons.length; i++) {
-	updateButton(i);
+function updateUIButtons() {
+    for (let i = 0; i < UIButtons.length; i++) {
+	updateUIButton(i);
     }
 }
 
@@ -299,7 +331,7 @@ function updateCenter() {
 function setup() {
     createCanvas(windowWidth, windowHeight);
     updateCenter();
-    updateButtons();
+    updateUIButtons();
     textSize(16);
     maxAtomDiamater = 2*max(width, height);
     let bounds = textBounds("W", 0, 0);
@@ -314,10 +346,10 @@ function mousePressed() {
     dragging = false;
 }
 
-function drawButton(id) {
-    let color = "#ff7777";
-    if (isMouseOverButton(id)) {
-	color = "#7777ff";
+function drawButton(buttons, id) {
+    let	color = "#458588";
+    if (isMouseOverButton(buttons, id)) {
+	color = "#98971A";
     }
 
     stroke(color);
@@ -325,7 +357,7 @@ function drawButton(id) {
     text(buttons[id].label, buttons[id].x, buttons[id].y);
 }
 
-function isMouseOverButton(id) {
+function isMouseOverButton(buttons, id) {
     return (mouseX > buttons[id].x &&
 	    mouseX < buttons[id].x + buttons[id].w &&
 	    mouseY > buttons[id].y - buttons[id].h &&
@@ -344,8 +376,15 @@ function resetGame() {
 }
 
 function mouseClicked() {
-    if (showWelcome) {
-	showWelcome = false;
+    if (home.open) {
+	if (mouseX > home.buttons[0].x - 6*padding - home.buttons[0].h/2 &&
+	    mouseX < home.buttons[0].x + home.buttons[0].w -6*padding + home.buttons[0].h/2 &&
+	    mouseY > home.buttons[0].y - home.buttons[0].h + 3*padding &&
+	    mouseY < home.buttons[0].y + 3*padding) {
+	    home.open = false;
+	    return;
+	}
+
 	return;
     }
 
@@ -353,8 +392,8 @@ function mouseClicked() {
 	mouseX < physicsOptions.x + physicsOptions.w &&
 	mouseY > physicsOptions.y &&
 	mouseY < physicsOptions.y + physicsOptions.h) {
-	if (isMouseOverButton(1)) {
-	    console.log("clicked button 1 (physics settings)");
+	if (isMouseOverButton(UIButtons, 4)) {
+	    console.log("clicked button 4 (physics settings)");
 	    physicsOptions.open = !physicsOptions.open;
 	    return;
 	}
@@ -377,14 +416,14 @@ function mouseClicked() {
 	mouseX < atomSelector.x + atomSelector.w &&
 	mouseY > atomSelector.y &&
 	mouseY < atomSelector.y + atomSelector.h) {
-	if (isMouseOverButton(3)) {
+	if (isMouseOverButton(UIButtons, 3)) {
 	    console.log("clicked button 3 (atom selector)");
 	    atomSelector.open = !atomSelector.open;
 	    return;
 	}
 
 	let x = atomSelector.x + padding;
-	let y = buttons[3].y + 3 * padding + lineSize;
+	let y = UIButtons[3].y + 3 * padding + lineSize;
 	let totalIndex = 0;
 	let placed = 0;
 	stroke(0);
@@ -431,29 +470,24 @@ function mouseClicked() {
 	mouseX < bar.x + bar.w &&
 	mouseY > bar.y &&
 	mouseY < bar.y + bar.h) {
-	if (isMouseOverButton(0)) {
-	    console.log("clicked button 0 (reset)");
+	if (isMouseOverButton(UIButtons, 2)) {
+	    console.log("clicked button 2 (reset)");
 	    resetGame();
 	    return;
 	}
 
-	if (isMouseOverButton(4)) {
-	    console.log("clicked button 4 (help)");
-	    showWelcome = true;
+	if (isMouseOverButton(UIButtons, 1)) {
+	    console.log("clicked button 1 (pause/unpause)");
+	    paused = !paused;
 	    return;
 	}
 
+	if (isMouseOverButton(UIButtons, 0)) {
+	    console.log("clicked button 0 (home)");
+	    home.open = true;
+	    return;
+	}
 
-	return;
-    }
-
-    if (mouseX > buttons[2].x &&
-	mouseX < buttons[2].x + buttons[2].w &&
-	mouseY < buttons[2].y &&
-	mouseY > buttons[2].y - buttons[2].h) {
-
-	console.log("clicked button 2 (pause/unpause)");
-	paused = !paused;
 	return;
     }
 
@@ -515,7 +549,7 @@ function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
     maxAtomDiamater = 2*max(width, height);
     updateCenter();
-    updateButtons();
+    updateUIButtons();
 }
 
 function processGravity(dt) {
@@ -613,7 +647,7 @@ function getUnit() {
 }
 
 function mouseDragged() {
-    if (showWelcome) { return; }
+    if (home.open) { return; }
     cursor.x += mouseX - pmouseX;
     cursor.y += mouseY - pmouseY;
     centerY = offset.y + cursor.y;
@@ -622,7 +656,7 @@ function mouseDragged() {
 }
 
 function keyTyped() {
-    if (showWelcome) { return; }
+    if (home.open) { return; }
     if (key === 'r') {
 	resetGame();
     }
@@ -633,8 +667,8 @@ function keyTyped() {
 }
 
 function handleKeys() {
-    if (keyIsDown(RETURN)) showWelcome = false;
-    if (showWelcome) { return; }
+    if (keyIsDown(RETURN)) home.open = false;
+    if (home.open) { return; }
 
     let panStep = cursorSpeed * deltaTime / 1000;
     if (keyIsDown('ArrowLeft') || keyIsDown('a')) {
@@ -741,8 +775,14 @@ function drawAtoms() {
 }
 
 function drawStatusBar() {
-    textSize(16);
+    textSize(24);
     noStroke();
+    if (paused) {
+	UIButtons[1].label = "Resume";
+    } else {
+	UIButtons[1].label = "Pause";
+    }
+
     let scaleStatus = "scale = 1:" + (scale*10**exponent).toExponential(2);
     let atomStatus = "atoms = " + atoms.length;
     let fpsStatus = "fps = " + Math.round(frameRate());
@@ -752,57 +792,46 @@ function drawStatusBar() {
     let fpsBounds = textBounds(fpsStatus, width/2, 0);
 
     // recompute new bar.
-    bar.h = buttons[0].h + 2*padding;
-    bar.w = buttons[0].w + scaleBounds.w + atomBounds.w + fpsBounds.w + buttons[4].w + 2*padding + 4*padding;
-    bar.x = buttons[0].x - scaleBounds.w - padding;
+    bar.h = UIButtons[0].h + 2*padding;
+    bar.w = UIButtons[0].w + scaleBounds.w + atomBounds.w + fpsBounds.w + UIButtons[1].w + UIButtons[2].w + 10*padding;
+    bar.x = UIButtons[0].x - scaleBounds.w - 4*padding - UIButtons[1].w;
 
     // draw bar
-    fill(255);
+    fill("#32302F");
     rect(bar.x, bar.y, bar.w, bar.h);
     circle(bar.x, bar.h/2 + bar.y, bar.h);
     circle(bar.x+bar.w, bar.h/2 + bar.y, bar.h);
 
-    // draw text around button.
-    stroke(0);
-    fill(0);
+    fill("#EBDBB2");
     text(scaleStatus, bar.x, bar.y + scaleBounds.h + padding);
-    text(atomStatus, buttons[4].x + buttons[4].w + padding, bar.y + atomBounds.h + padding);
-    text(fpsStatus, buttons[4].x + buttons[4].w+atomBounds.w+2*padding, bar.y + atomBounds.h + padding);
-    drawButton(0);
-    drawButton(4);
+    text(atomStatus, UIButtons[2].x + UIButtons[2].w + 2*padding, bar.y + atomBounds.h + padding);
+    text(fpsStatus, UIButtons[2].x + UIButtons[2].w+atomBounds.w+4*padding, bar.y + atomBounds.h + padding);
+    drawButton(UIButtons, 0);
+    drawButton(UIButtons, 1);
+    drawButton(UIButtons, 2);
 }
 
 function drawPaused() {
-    let button = buttons[2];
-    if (paused) {
-	button.label = "Resume";
-    } else {
-	button.label = "Pause";
-    }
+    let button = UIButtons[2];
 
-    let bounds = textBounds(button.label, width/2, height);
-    button.y = height - bounds.h - 3.5*padding;
-    button.x = width/2 - bounds.w/2 + padding/2;
-    button.w = bounds.w + padding;
-    button.h = bounds.h + padding;
 
-    fill(255);
+    fill("#32302F");
     stroke(255);
     rect(button.x - padding/2, button.y - button.h + padding/2, button.w, button.h);
     circle(button.x - padding/2, button.y - button.h/2 + padding/2, button.h);
     circle(button.x + button.w, button.y - button.h/2 + padding/2, button.h);
     stroke(0);
-    fill(0);
-    drawButton(2);
+    fill("#EBDBB2");
+    drawButton(UIButtons, 2);
 }
 
 function drawPhysicsOptions() {
-    let button = buttons[1];
+    let button = UIButtons[4];
     physicsOptions.h = padding + button.h + padding + lineSize/2;
     physicsOptions.w = 0;
     for (let i = 0; i < physicsOptions.checkBoxes.length; i++) {
 	let bounds = textBounds(physicsOptions.checkBoxes[i].label, 0, 0);
-	physicsOptions.w = max(physicsOptions.w, bounds.w + 1.5 * padding + checkBoxSize);
+	physicsOptions.w = max(physicsOptions.w, bounds.w + 1.5 * padding + checkBoxSize) + padding;
     }
 
     physicsOptions.w = max(physicsOptions.w, 1.5 * padding + button.h/2 + button.w) + 2 * padding;
@@ -815,10 +844,10 @@ function drawPhysicsOptions() {
     physicsOptions.x = button.x - padding - button.h/2;
     physicsOptions.y = button.y - button.h;
 
-    fill(255);
+    fill("#32302F");
     rect(physicsOptions.x, physicsOptions.y, physicsOptions.w, physicsOptions.h, 10);
     fill(127);
-    rect(button.x, button.y + 2 * padding - lineSize/2, button.w, lineSize);
+    rect(button.x, button.y + 2 * padding - lineSize/2, physicsOptions.w-4*padding, lineSize);
 
     let y = button.y + 2.5 * padding + lineSize;
     textAlign(LEFT, CENTER);
@@ -839,7 +868,7 @@ function drawPhysicsOptions() {
 	square(checkBox.x, checkBox.y, checkBoxSize);
 
 	noStroke();
-	fill(0);
+	fill("#EBDBB2");
 	text(checkBox.label, checkBox.x + checkBoxSize + padding/2, checkBox.y + checkBoxSize/2);
 
 	let bounds = textBounds(checkBox.label, 0, 0);
@@ -850,10 +879,10 @@ function drawPhysicsOptions() {
 }
 
 function drawPhysicsSettings() {
-    fill(255);
+    fill("#32302F");
     noStroke();
 
-    let button = buttons[1];
+    let button = UIButtons[4];
     if (physicsOptions.open)  {
 	drawPhysicsOptions();
     } else {
@@ -861,19 +890,20 @@ function drawPhysicsSettings() {
 	physicsOptions.w = button.w + button.h + padding;
 	physicsOptions.x = button.x - padding - button.h/2;
 	physicsOptions.y = button.y - button.h;
+
 	rect(button.x - padding/2, button.y - button.h, button.w + padding, button.h + padding);
 	circle(button.x - padding/2, button.y - button.h/2 + padding/2, button.h+padding);
 	circle(button.x + button.w + padding/2, button.y - button.h/2 + padding/2, button.h+padding);
     }
 
-    drawButton(1);
+    drawButton(UIButtons, 4);
 }
 
 function drawAtomSelectorOpen() {
-    fill(255);
+    fill("#32302F");
     noStroke();
 
-    let button = buttons[3];
+    let button = UIButtons[3];
     let heading = button.h + 4*padding + lineSize
     atomSelector.max = floor((height - heading)/atomSelector.size) * atomSelector.columns;
     atomSelector.h = heading + Math.ceil(min(atomSelector.count, atomSelector.max)/atomSelector.columns) * atomSelector.size;
@@ -912,14 +942,14 @@ function drawAtomSelectorOpen() {
 	}
     }
 
-    drawButton(3);
+    drawButton(UIButtons, 3);
 }
 
 function drawAtomSelector() {
-    fill(255);
+    fill("#32302F");
     noStroke();
 
-    let button = buttons[3];
+    let button = UIButtons[3];
     if (atomSelector.open)  {
 	drawAtomSelectorOpen();
     } else {
@@ -932,54 +962,81 @@ function drawAtomSelector() {
 	circle(button.x + button.w + padding/2, button.y - button.h/2 + padding/2, button.h+padding);
     }
 
-    drawButton(3);
+    drawButton(UIButtons, 3);
 }
 
 function drawHud() {
     drawStatusBar();
     drawPhysicsSettings();
     drawAtomSelector();
-    drawPaused();
 }
 
-function drawWelcome() {
-    textSize(16);
+function drawHome() {
+    fill("#EBDBB2BB");
+    rect(0, 0, width,height);
+    textSize(48);
     noStroke();
-    let welcomeText = `Welcome to phychem-ulator, a physics and chemistry simulator
-    Usage:
-    Move around by grabbing the coordinate plane by dragging it while pressing your left mouse button, by using the WASD-keys, or by using the arrow-keys.
-    Place atoms by clicking with your left mouse button.
-    Scroll up/down to zoom in/out.
 
-    UI:
-    In the top middle part of your screen there is a bar with your current scale/zoom level compared to when you just launched the simulation. A reset button which reset the simulation, your cursor position, and your zoom, but not your settings. And a count of the total number of atoms in the simulation.
-    On the left side there is a button which opens a menu of settings for the physics engine.
-    On the right side there is a button which opens a menu for selecting different atoms.
-In the bottom middle part of your screen there is a pause/resume button with pauses or resmuses the simuation.
+    let titleBounds = textBounds(home.title.label, 0, 0);
+    textSize(32);
+    let startBounds = textBounds(home.buttons[0].label, 0, 0);
+    let instructionsBounds = textBounds(home.buttons[1].label, 0, 0);
 
-    Good things to know:
-    The Simulation aims to be realistic, atoms are always drawn but at least 5 pixels in size, but are realistic in size. Thus you'll need to zoom in alot (10'000'000'000 times) to be able to really seem them. On that note zooming in can be kind of difficult when every thing is so small, I suggest you place an atom, keep your mouse still, and then zoom in until the you can see the atom. This way you'll end up with your cursor at the atom. Also gravity is made 100'000'000 times stronger so you'll be able to actually see stuff moving in a timely manner.
+    let totalHeight = titleBounds.h + 6*padding + startBounds.h + 6*padding + instructionsBounds.h + 6*padding + 2*3*padding;
 
-    Clicking anywhere will close this screen.`
-    let welcomeWidth = width/2 + padding;
-    let bounds = textBounds(welcomeText, width/2, 0, welcomeWidth - padding);
-    let welcomeHeight = bounds.h + 2*padding;
+    home.title.w = titleBounds.w + 6*padding + titleBounds.h;
+    home.title.h = titleBounds.h + 6*padding;
+    home.title.x = width/2 - home.title.w/2;
+    home.title.y = height/2 - totalHeight/2;
 
-    fill(255);
-    rect(width/2-welcomeWidth/2, height/2-welcomeHeight/2, welcomeWidth, welcomeHeight, 10);
+    home.buttons[0].w = startBounds.w + 6*padding + startBounds.h;
+    home.buttons[0].h = startBounds.h + 6*padding;
+    home.buttons[0].x = width/2 - home.buttons[0].w/2;
+    home.buttons[0].y = home.title.y + home.title.h + 2*padding;
 
-    fill(0);
-    stroke(0);
-    text(welcomeText, width/2-welcomeWidth/2+padding/2, height/2 - welcomeHeight/2+padding, welcomeWidth - padding);
+    home.buttons[1].w = instructionsBounds.w + 6*padding + instructionsBounds.h;
+    home.buttons[1].h = instructionsBounds.h + 6*padding;
+    home.buttons[1].x = width/2 - home.buttons[1].w/2;
+    home.buttons[1].y = home.buttons[0].y + home.buttons[0].h + 2*padding;
+
+    fill("#32302F");
+    rect(home.title.x - 6*padding, home.title.y - home.title.h + 3* padding, home.title.w, home.title.h);
+    circle(home.title.x - 6*padding, home.title.y - home.title.h/2 + 3*padding, home.title.h);
+    circle(home.title.x + home.title.w - 6*padding, home.title.y - home.title.h/2 + 3*padding, home.title.h);
+    fill("#EBDBB2");
+    textSize(48);
+    fill("#CC241D");
+    text(home.title.label, home.title.x, home.title.y-1.5*padding);
+
+    textSize(32);
+    noStroke();
+    for (let i = 0; i < home.buttons.length; i++) {
+	fill("#32302F");
+	let button = home.buttons[i];
+	rect(button.x - 6*padding, button.y - button.h + 3* padding, button.w, button.h);
+	circle(button.x - 6*padding, button.y - button.h/2 + 3*padding, button.h);
+	circle(button.x + button.w - 6*padding, button.y - button.h/2 + 3*padding, button.h);
+	fill("#EBDBB2");
+	if (mouseX > button.x - 6*padding - button.h/2 &&
+	    mouseX < button.x + button.w -6*padding + button.h/2 &&
+	    mouseY > button.y -button.h + 3*padding &&
+	    mouseY < button.y + 3*padding) {
+	    fill("#98971A");
+	} else {
+	    fill("#EBDBB2");
+	}
+
+	text(button.label, button.x, button.y-padding);
+    }
 }
 
 function draw() {
-    background(172);
+    background("#EBDBB2");
     fill(128, 255, 128);
     handleKeys();
-    if (!paused) { processPhysics(); }
+    if (!paused && !home.open && !instructionsOpen) processPhysics();
     drawCoordinatePlane();
     drawAtoms();
-    drawHud();
-    if (showWelcome) { drawWelcome(); }
+    if (!home.open && !instructionsOpen) drawHud();
+    if (home.open) drawHome();
 }
