@@ -267,6 +267,7 @@ let currentAtom = {
     Z: 1,
     r: 31,
     c: "#ff0000",
+    name: "Hydrogen",
     halfTime: 0,
     alpha: false,
     betaMin: false,
@@ -275,93 +276,93 @@ let currentAtom = {
 };
 
 let periodicTable = [
-    {symbol: "H", Z:1, r:31, c:"#ff0000",
+    {symbol: "H", Z:1, r:31, c:"#ff0000", name: "Hydrogen",
      isotopes: [{A:1, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
 		{A:2, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
 		{A:3, halfTime: 12.3*secondsYear, alpha: false, betaPlus: false, betaMin: true, gamma: false }],},
-    {symbol: "He", Z:2, r:28, c:"#00ff00",
+    {symbol: "He", Z:2, r:28, c:"#00ff00", name: "Helium",
      isotopes: [{A:3, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
 		{A:4, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
 		{A:6, halfTime: 0.807, alpha: false, betaPlus: false, betaMin: true, gamma: false }],},
-    {symbol: "Li", Z:3, r:128, c:"#ffff00",
+    {symbol: "Li", Z:3, r:128, c:"#ffff00", name: "Lithium",
      isotopes: [{A:6, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
 		{A:7, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
 		{A:8, halfTime: 0.838, alpha: false, betaPlus: false, betaMin: true, gamma: false }],},
-    {symbol: "Be", Z:4, r:96, c:"#ff00ff",
+    {symbol: "Be", Z:4, r:96, c:"#ff00ff", name: "Berylium",
      isotopes: [{A:7, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
 		{A:8, halfTime: 1e-16, alpha: true, betaPlus: false, betaMin: false, gamma: false },
 		{A:9, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
 		{A:10, halfTime: secondsYear*1.5e6, alpha: false, betaPlus: false, betaMin: true, gamma: false }],},
-    {symbol: "B", Z:5, r:84, c:"#00ffff",
+    {symbol: "B", Z:5, r:84, c:"#00ffff", name: "Boron",
      isotopes: [{A:8, halfTime: 0.77, alpha: false, betaPlus: true, betaMin: false, gamma: false },
 		{A:10, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
 		{A:11, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
 		{A:12, halfTime: 0.02, alpha: false, betaPlus: false, betaMin: true, gamma: true }],},
-    {symbol: "C", Z:6, r:76, c:"#ffbb00",
+    {symbol: "C", Z:6, r:76, c:"#ffbb00", name: "Carbon",
      isotopes: [{A:10, halfTime: 19.2, alpha: false, betaPlus: true, betaMin: false, gamma: false },
 		{A:11, halfTime: 20.4*60, alpha: false, betaPlus: true, betaMin: false, gamma: false },
 		{A:12, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
 		{A:13, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
 		{A:14, halfTime: 5730*secondsYear, alpha: false, betaPlus: false, betaMin: true, gamma: false }],},
-    {symbol: "N", Z:7, r:71, c:"#ff00bb",
+    {symbol: "N", Z:7, r:71, c:"#ff00bb", name: "Nitrogen",
      isotopes: [{A:12, halfTime: 0.011, alpha: false, betaPlus: true, betaMin: false, gamma: false },
 		{A:13, halfTime: 9.97*60, alpha: false, betaPlus: true, betaMin: false, gamma: false },
 		{A:14, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
 		{A:15, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
 		{A:16, halfTime: 7.13, alpha: false, betaPlus: false, betaMin: true, gamma: false }],},
-    {symbol: "O", Z:8, r:66, c:"#bbff00",
+    {symbol: "O", Z:8, r:66, c:"#bbff00", name: "Oxygen",
      isotopes: [{A:15, halfTime: 0.011, alpha: false, betaPlus: true, betaMin: false, gamma: false },
 		{A:16, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
 		{A:17, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
 		{A:18, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
 		{A:19, halfTime: 7.13, alpha: false, betaPlus: false, betaMin: true, gamma: true }],},
-    {symbol: "F", Z:9, r:57, c:"#00ffbb",
+    {symbol: "F", Z:9, r:57, c:"#00ffbb", name: "Fluorine",
      isotopes: [{A:19, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },],},
-    {symbol: "Ne", Z:10, r:58, c:"#bb00ff",
+    {symbol: "Ne", Z:10, r:58, c:"#bb00ff", name: "Neon",
      isotopes: [{A:20, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
 		{A:21, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
 		{A:22, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
 		{A:24, halfTime: 3.38*60, alpha: false, betaPlus: false, betaMin: true, gamma: true },],},
-    {symbol: "Na", Z:11, r:166, c:"#ffbbbb",
+    {symbol: "Na", Z:11, r:166, c:"#ffbbbb", name: "Sodium",
      isotopes: [{A:22, halfTime: 2.6*secondsYear, alpha: false, betaPlus: true, betaMin: false, gamma: true },
 		{A:23, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
 		{A:24, halfTime: 14.96*3600, alpha: false, betaPlus: false, betaMin: true, gamma: true },],},
-    {symbol: "Mg", Z:12, r:141, c:"#bbffbb",
+    {symbol: "Mg", Z:12, r:141, c:"#bbffbb", name: "Magnesium",
      isotopes: [{A:22, halfTime: 3.9, alpha: false, betaPlus: true, betaMin: false, gamma: false },
 		{A:24, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
 		{A:25, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
 		{A:26, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
 		{A:28, halfTime: 14.96*3600, alpha: false, betaPlus: false, betaMin: true, gamma: false },],},
-    {symbol: "Al", Z:13, r:121, c:"#bbbbff",
+    {symbol: "Al", Z:13, r:121, c:"#bbbbff", name: "Aluminium",
      isotopes: [{A:26, halfTime: secondsYear*7.17e7, alpha: false, betaPlus: true, betaMin: false, gamma: false },
 		{A:27, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
 		{A:28, halfTime: 2.4*60, alpha: false, betaPlus: false, betaMin: true, gamma: true },],},
-    {symbol: "Si", Z:14, r:111, c:"#bb0000",
+    {symbol: "Si", Z:14, r:111, c:"#bb0000", name: "Silicon",
      isotopes: [{A:28, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
 		{A:29, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
 		{A:30, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
 		{A:31, halfTime: 2.6*3600, alpha: false, betaPlus: false, betaMin: true, gamma: false },
 		{A:32, halfTime: secondsYear*150, alpha: false, betaPlus: false, betaMin: true, gamma: false },],},
-    {symbol: "P", Z:15, r:107, c:"#00bb00",
+    {symbol: "P", Z:15, r:107, c:"#00bb00", name: "Phosphorus",
      isotopes: [{A:30, halfTime: 2.5*60, alpha: false, betaPlus: true, betaMin: false, gamma: false },
 		{A:31, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
 		{A:32, halfTime: 14.3*secondsDay, alpha: false, betaPlus: false, betaMin: true, gamma: false },
 		{A:33, halfTime: 25.3*secondsDay, alpha: false, betaPlus: false, betaMin: true, gamma: false },],},
-    {symbol: "S", Z:16, r:105, c:"#bbbb00",
+    {symbol: "S", Z:16, r:105, c:"#bbbb00", name: "Sulfur",
      isotopes: [{A:32, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
 		{A:33, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
 		{A:34, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
 		{A:35, halfTime: 87.3*secondsDay, alpha: false, betaPlus: false, betaMin: true, gamma: false },
 		{A:36, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
 		{A:38, halfTime: 2.84*secondsDay, alpha: false, betaPlus: false, betaMin: true, gamma: false },],},
-    {symbol: "Cl", Z:17, r:102, c:"#bb00bb",
+    {symbol: "Cl", Z:17, r:102, c:"#bb00bb", name: "Chlorine",
      isotopes: [{A:34, halfTime: 1.53, alpha: false, betaPlus: true, betaMin: false, gamma: true },
 		{A:35, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
 		{A:36, halfTime: secondsYear*3.01e5, alpha: false, betaPlus: true, betaMin: true, gamma: false },
 		{A:37, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
 		{A:38, halfTime: 37.2*60, alpha: false, betaPlus: false, betaMin: true, gamma: true },
 		{A:39, halfTime: 55.5*60, alpha: false, betaPlus: false, betaMin: true, gamma: false },],},
-    {symbol: "Ar", Z:18, r:106, c:"#00bbbb",
+    {symbol: "Ar", Z:18, r:106, c:"#00bbbb", name: "Argon",
      isotopes: [{A:36, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
 		{A:37, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
 		{A:38, halfTime: 0, alpha: false, betaPlus: false, betaMin: false, gamma: false },
@@ -681,6 +682,7 @@ function mouseClicked() {
 			r: atom.r,
 			c: atom.c,
 			halfTime: atom.isotopes[j].halfTime,
+			name: atom.name,
 			alpha: atom.isotopes[j].alpha,
 			betaMin: atom.isotopes[j].betaMin,
 			betaPlus: atom.isotopes[j].betaPlus,
@@ -743,6 +745,7 @@ function mouseClicked() {
 	Z: currentAtom.Z,
 	r: currentAtom.r * 1e-12,
 	c: currentAtom.c,
+	name: currentAtom.name,
 	halfTime: currentAtom.halfTime,
 	alpha: currentAtom.alpha,
 	betaMin: currentAtom.betaMin,
@@ -760,12 +763,7 @@ function mouseClicked() {
 }
 
 function mouseWheel(event) {
-    if (homeMenu.open) return false;
-    if (instructionsMenu.open) {
-
-	return false;
-    }
-
+    if (homeMenu.open || instructionsMenu.open || presetsMenu.open) return false;
     if (mouseX > atomSelector.x &&
 	mouseX < atomSelector.x + atomSelector.w &&
 	mouseY > atomSelector.y &&
@@ -875,6 +873,7 @@ function updateDecayedAtom(atom) {
     }
 
     atom.symbol = element.symbol;
+    atom.name = element.name;
     atom.r = element.r * 1e-12;
     atom.c = element.c;
     atom.halfTime = isotope.halfTime;
@@ -917,6 +916,7 @@ function processDecay(dt) {
 		    r: 28 * 1e-12,
 		    c: "#00ff00",
 		    symbol: "He",
+		    name: "Helium",
 		    vx: atom.vx + physicsSettings.alphaSpeedMultiplier*randSpeed*sin(randAngle),
 		    vy: atom.vy + physicsSettings.alphaSpeedMultiplier*randSpeed*cos(randAngle),
 		    ay: 0,
@@ -925,7 +925,6 @@ function processDecay(dt) {
 		    y: atom.y,
 		});
 
-		console.log(randSpeed*sin(randAngle));
 		if (atom.gamma) spawnGamma(atom);
 		updateDecayedAtom(atom);
 	    } else if (atom.betaMin) {
@@ -1105,6 +1104,34 @@ function handleKeys() {
     if (keyIsDown('ArrowDown') || keyIsDown('KeyS')) {
 	cursor.y -= panStep;
 	centerY = offset.y + cursor.y
+    }
+
+    if (keyIsDown('Shift')) {
+	for (let i = 0; i < atoms.length; i++) {
+	    let x = centerX + atoms[i].x / (scale*10**exponent) * stepSize;
+	    let y = centerY - atoms[i].y / (scale*10**exponent) * stepSize;
+	    let d = constrain(2*atoms[i].r * stepSize/(scale*10**exponent), minAtomDiamater, maxAtomDiamater);
+	    if (dist(mouseX, mouseY, x, y) <= d/2) {
+		let txt = "Name: " + atoms[i].name + "\n" +
+		    "Isotope: " + atoms[i].A + "\n" +
+		    "Weight: " + atoms[i].A*physicsConstants.atomicMass + " Kilograms\n" +
+		    "Size: " + atoms[i].r * 1e-12 + " Meters\n" +
+		    "VX: " + atoms[i].vx + " Meters/Second\n" +
+		    "VY: " + atoms[i].vy + " Meters/Second\n" +
+		    "AX: " + atoms[i].ax + " Meters/Second/Second\n" +
+		    "AY: " + atoms[i].ay + " Meters/Second/Second";
+
+		if (atoms[i].halfTime) {
+		    txt += "\nHalftime: " + atoms[i].halfTime + " seconds";
+		}
+
+		let bounds = textBounds(txt, 0, 0);
+		fill("#32302F");
+		rect(mouseX-bounds.w-4*padding, mouseY-bounds.h-4*padding, bounds.w+4*padding, bounds.h+4*padding, 10);
+		fill("#EBDBB2");
+		text(txt, mouseX-bounds.w-padding, mouseY-bounds.h+padding);
+	    }
+	}
     }
 }
 
@@ -1331,6 +1358,25 @@ function drawAtomSelectorOpen() {
 	    fill(0);
 	    text(txt, x + (atomSelector.size - bounds.w)/2, y + atomSelector.size -(atomSelector.size - bounds.h)/2);
 
+	    if (mouseX > x &&
+		mouseX < x+atomSelector.size &&
+		mouseY > y &&
+		mouseY < y+atomSelector.size) {
+		let txt = "Name: " + periodicTable[i].name + "\n" +
+		    "Isotope: " + periodicTable[i].isotopes[j].A + "\n" +
+		    "Weight: " + periodicTable[i].isotopes[j].A*physicsConstants.atomicMass + " Kilograms\n" +
+		    "Size: " + periodicTable[i].r * 1e-12 + " Meters";
+
+		if (periodicTable[i].isotopes[j].halfTime) {
+		    txt += "\nHalftime: " + periodicTable[i].isotopes[j].halfTime + " seconds";
+		}
+		let bounds = textBounds(txt, 0, 0);
+		fill("#32302F");
+		rect(mouseX-bounds.w-4*padding, mouseY-bounds.h-4*padding, bounds.w+4*padding, bounds.h+4*padding, 10);
+		fill("#EBDBB2");
+		text(txt, mouseX-bounds.w-padding, mouseY-bounds.h+padding);
+	    }
+
 	    if (placed%atomSelector.columns === 0) {
 		y += atomSelector.size;
 		x = atomSelector.x + 3*padding;
@@ -1441,12 +1487,12 @@ function drawInstructionsMenu() {
 
     let instructionText = [
 	"UI-elements:",
-	"- left: settings menu for the physics engine.",
-	"- right menu to select an atom to place.",
-	"- middle bar with infomartion and the following buttons:",
-	"  - left: A button to pause/resume the simulation.",
+	"- left     : settings menu for the physics engine.",
+	"- right   : menu to select an atom to place.",
+	"- middle: bar with infomation and the following buttons:",
+	"  - left     : A button to pause/resume the simulation.",
 	"  - middle: A Home button to bring you to the main menu.",
-	"  - right: A button to reset the simulation, but not your settings.",
+	"  - right   : A button to reset the simulation, but not your settings.",
 	"",
 	"Move around by:",
 	"- Dragging the coordinateplane whiles holding down the left mouse button.",
@@ -1456,6 +1502,7 @@ function drawInstructionsMenu() {
 	"Miscellaneous:",
 	"Place atoms by clicking with your left mouse button.",
 	"Press z to undo the last placement.",
+	"Press Shift while looking at an atom to see info about it.",
     ];
 
     let textHeight = 0;
@@ -1715,7 +1762,6 @@ function drawGamma() {
 function draw() {
     background("#EBDBB2");
     fill(128, 255, 128);
-    handleKeys();
     if (!paused && !homeMenu.open && !instructionsMenu.open && !presetsMenu.open) processPhysics();
     drawCoordinatePlane();
     drawAtoms();
@@ -1726,4 +1772,5 @@ function draw() {
     if (homeMenu.open) drawHomeMenu();
     if (instructionsMenu.open) drawInstructionsMenu();
     if (presetsMenu.open) drawPresetsMenu();
+    handleKeys();
 }
