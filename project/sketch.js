@@ -28,6 +28,107 @@ let gamma = [];
 let electrons = [];
 let positrons = [];
 
+let presets = [
+    { name: "Orbit",
+      x: 0,
+      y: 0,
+      w: 0,
+      h: 0,
+      atoms: [
+	  {
+	      symbol: "H",
+	      A: 1,
+	      Z: 1,
+	      r: 31 * 1e-12,
+	      c: "#ff0000",
+	      halfTime: 0,
+	      alpha: false,
+	      betaMin: false,
+	      betaPlus: false,
+	      gamma: false,
+	      x: 200 * 1e-12,
+	      y: 0,
+	      vx: 0,
+	      vy: -9.415804192*10**-10,
+	      ax: 0,
+	      ay: 0,
+	  },
+	  {
+	      symbol: "H",
+	      A: 1,
+	      Z: 1,
+	      r: 31 * 1e-12,
+	      c: "#ff0000",
+	      halfTime: 0,
+	      alpha: false,
+	      betaMin: false,
+	      betaPlus: false,
+	      gamma: false,
+	      x: -200 * 1e-12,
+	      y: 0,
+	      vx: 0,
+	      vy: 9.415804192*10**-10,
+	      ax: 0,
+	      ay: 0,
+	  },
+	  {
+	      symbol: "H",
+	      A: 1,
+	      Z: 1,
+	      r: 31 * 1e-12,
+	      c: "#ff0000",
+	      halfTime: 0,
+	      alpha: false,
+	      betaMin: false,
+	      betaPlus: false,
+	      gamma: false,
+	      x: 0,
+	      y: -200 * 1e-12,
+	      vx: -9.415804192*10**-10,
+	      vy: 0,
+	      ax: 0,
+	      ay: 0,
+	  },
+	  {
+	      symbol: "H",
+	      A: 1,
+	      Z: 1,
+	      r: 31 * 1e-12,
+	      c: "#ff0000",
+	      halfTime: 0,
+	      alpha: false,
+	      betaMin: false,
+	      betaPlus: false,
+	      gamma: false,
+	      x: 0,
+	      y: 200 * 1e-12,
+	      vx: 9.415804192*10**-10,
+	      vy: 0,
+	      ax: 0,
+	      ay: 0,
+	  },
+	  {
+	      symbol: "O",
+	      A: 16,
+	      Z: 8,
+	      r: 66 * 1e-12,
+	      c: "#bbff00",
+	      halfTime: 0,
+	      alpha: false,
+	      betaMin: false,
+	      betaPlus: false,
+	      gamma: false,
+	      x: 0,
+	      y: 0,
+	      vx: 0,
+	      vy: 0,
+	      ax: 0,
+	      ay: 0,
+	  }
+      ],
+    }
+];
+
 let instructionsMenu = {
     open: false,
     title: {
@@ -43,6 +144,24 @@ let instructionsMenu = {
 	    y: 0,
 	    w: 0,
 	    h: 0,
+    },
+}
+
+let presetsMenu = {
+    open: false,
+    title: {
+	label: "Presets",
+	x: 0,
+	y: 0,
+	w: 0,
+	h: 0,
+    },
+    button: {
+	label: "back",
+	x: 0,
+	y: 0,
+	w: 0,
+	h: 0,
     },
 }
 
@@ -66,6 +185,13 @@ let homeMenu = {
 	},
 	{
 	    label: "Instructions",
+	    x: 0,
+	    y: 0,
+	    w: 0,
+	    h: 0,
+	},
+	{
+	    label: "Presets",
 	    x: 0,
 	    y: 0,
 	    w: 0,
@@ -434,6 +560,16 @@ function mouseClicked() {
 	    return;
 	}
 
+	if (mouseX > homeMenu.buttons[2].x - homeMenu.buttons[2].h/2 &&
+	    mouseX < homeMenu.buttons[2].x + homeMenu.buttons[2].w + homeMenu.buttons[2].h/2 &&
+	    mouseY > homeMenu.buttons[2].y - homeMenu.buttons[2].h + 3*padding &&
+	    mouseY < homeMenu.buttons[2].y + 3*padding) {
+	    homeMenu.open = false;
+	    presetsMenu.open = true;
+	    console.log("Opened presetsMenu");
+	    return;
+	}
+
 	return;
     }
 
@@ -447,6 +583,33 @@ function mouseClicked() {
 	    console.log("Opened homeMenu");
 	    return;
 	}
+	return;
+    }
+
+    if (presetsMenu.open) {
+	if (mouseX > presetsMenu.button.x- presetsMenu.button.h/2 &&
+	    mouseX < presetsMenu.button.x + presetsMenu.button.w + presetsMenu.button.h/2 &&
+	    mouseY > presetsMenu.button.y -presetsMenu.button.h + 3*padding &&
+	    mouseY < presetsMenu.button.y + 3*padding) {
+	    homeMenu.open = true;
+	    presetsMenu.open = false;
+	    console.log("Opened homeMenu");
+	    return;
+	}
+
+	for (let i = 0; i < presets.length; i++) {
+	    if (mouseX > presets[i].x- presets[i].h/2 &&
+		mouseX < presets[i].x + presets[i].w + presets[i].h/2 &&
+		mouseY > presets[i].y -presets[i].h + 3*padding &&
+		mouseY < presets[i].y + 3*padding) {
+		presetsMenu.open = false;
+		console.log("Selected preset: " + presets[i].name);
+		resetGame();
+		atoms = structuredClone(presets[i].atoms);
+		return;
+	    }
+	}
+
 	return;
     }
 
@@ -562,7 +725,7 @@ function mouseClicked() {
 	return;
     }
 
-    if (dragging >= 10) { return; }
+    if (dragging >= 7) { return; }
     let atom = {
 	symbol: currentAtom.symbol,
 	A: currentAtom.A,
@@ -892,8 +1055,11 @@ function keyPressed() {
         if (instructionsMenu.open) {
             instructionsMenu.open = false;
             homeMenu.open = true;
-        } else if (homeMenu.open) {
-            homeMenu.open = false;
+        } if (presetsMenu.open) {
+            presetsMenu.open = false;
+            homeMenu.open = true;
+	} else if (homeMenu.open) {
+	    homeMenu.open = false;
         } else if (atomSelector.open || physicsOptions.open) {
             atomSelector.open = false;
             physicsOptions.open = false;
@@ -1202,6 +1368,7 @@ function drawHomeMenu() {
     textSize(32);
     let startBounds = textBounds(homeMenu.buttons[0].label, 0, 0);
     let instructionsBounds = textBounds(homeMenu.buttons[1].label, 0, 0);
+    let presetsBounds = textBounds(homeMenu.buttons[2].label, 0, 0);
 
     let totalHeight = titleBounds.h + 6*padding + startBounds.h + 6*padding + instructionsBounds.h + 6*padding + 2*3*padding;
 
@@ -1219,6 +1386,11 @@ function drawHomeMenu() {
     homeMenu.buttons[1].h = instructionsBounds.h + 6*padding;
     homeMenu.buttons[1].x = width/2 - homeMenu.buttons[1].w/2;
     homeMenu.buttons[1].y = homeMenu.buttons[0].y + homeMenu.buttons[0].h + 2*padding;
+
+    homeMenu.buttons[2].w = presetsBounds.w + 6*padding + presetsBounds.h;
+    homeMenu.buttons[2].h = presetsBounds.h + 6*padding;
+    homeMenu.buttons[2].x = width/2 - homeMenu.buttons[2].w/2;
+    homeMenu.buttons[2].y = homeMenu.buttons[1].y + homeMenu.buttons[1].h + 2*padding;
 
     fill("#32302F");
     rect(homeMenu.title.x, homeMenu.title.y - homeMenu.title.h + 3* padding, homeMenu.title.w, homeMenu.title.h);
@@ -1351,6 +1523,89 @@ function drawInstructionsMenu() {
     }
 }
 
+function drawPresetsMenu() {
+    fill("#EBDBB2BB");
+    rect(0, 0, width,height);
+    noStroke();
+
+    textSize(48);
+    let titleBounds = textBounds(presetsMenu.title.label, 0, 0);
+    textSize(32);
+    let startBounds = textBounds(presetsMenu.button.label, 0, 0);
+    let presetsBounds = textBounds(presetsMenu.button.label, 0, 0);
+    let totalHeight = titleBounds.h + 6*padding;
+    for (let i = 0; i < presets.length; i++) {
+	let bounds = textBounds(presets[i].name, 0, 0);
+	totalHeight += bounds.h + 6*padding + 4*padding;
+    }
+
+    presetsMenu.title.w = titleBounds.w + 6*padding + titleBounds.h;
+    presetsMenu.title.h = titleBounds.h + 6*padding;
+    presetsMenu.title.x = width/2 - presetsMenu.title.w/2;
+    presetsMenu.title.y = height/2 - totalHeight/2;
+
+    presetsMenu.button.w = startBounds.w + 6*padding + startBounds.h;
+    presetsMenu.button.h = startBounds.h + 6*padding;
+    presetsMenu.button.x = width/2 - presetsMenu.button.w/2;
+    presetsMenu.button.y = presetsMenu.title.y + presetsMenu.title.h + 2*padding;
+
+    for (let i = 0; i < presets.length; i++) {
+	let bounds = textBounds(presets[i].name, 0, 0);
+	totalHeight += bounds.h + 6*padding + 4*padding;
+	presets[i].h = bounds.h + 6*padding;
+	presets[i].w = bounds.w + bounds.h + 6*padding;
+	presets[i].x = width/2 - presets[i].w/2;
+	if (i === 0) {
+	    presets[i].y = presetsMenu.button.y + presetsMenu.button.h + 2*padding;
+	} else {
+	    presets[i-1].y = presets[i-1].y + presets[i-1].h + 2*padding;
+	}
+    }
+
+    fill("#32302F");
+    rect(presetsMenu.title.x, presetsMenu.title.y - presetsMenu.title.h + 3* padding, presetsMenu.title.w, presetsMenu.title.h);
+    circle(presetsMenu.title.x, presetsMenu.title.y - presetsMenu.title.h/2 + 3*padding, presetsMenu.title.h);
+    circle(presetsMenu.title.x + presetsMenu.title.w, presetsMenu.title.y - presetsMenu.title.h/2 + 3*padding, presetsMenu.title.h);
+    fill("#EBDBB2");
+    textSize(48);
+    fill("#CC241D");
+    text(presetsMenu.title.label, presetsMenu.title.x + 6*padding, presetsMenu.title.y-1.5*padding);
+
+    textSize(32);
+    fill("#32302F");
+    rect(presetsMenu.button.x, presetsMenu.button.y - presetsMenu.button.h + 3* padding, presetsMenu.button.w, presetsMenu.button.h);
+    circle(presetsMenu.button.x, presetsMenu.button.y - presetsMenu.button.h/2 + 3*padding, presetsMenu.button.h);
+    circle(presetsMenu.button.x + presetsMenu.button.w, presetsMenu.button.y - presetsMenu.button.h/2 + 3*padding, presetsMenu.button.h);
+    fill("#EBDBB2");
+    if (mouseX > presetsMenu.button.x- presetsMenu.button.h/2 &&
+	mouseX < presetsMenu.button.x + presetsMenu.button.w + presetsMenu.button.h/2 &&
+	mouseY > presetsMenu.button.y -presetsMenu.button.h + 3*padding &&
+	mouseY < presetsMenu.button.y + 3*padding) {
+	fill("#98971A");
+    } else {
+	fill("#EBDBB2");
+    }
+
+    text(presetsMenu.button.label, presetsMenu.button.x + 6*padding, presetsMenu.button.y);
+    textSize(32);
+    for (let i = 0; i < presets.length; i++) {
+	fill("#32302F");
+	rect(presets[i].x, presets[i].y - presets[i].h + 3* padding, presets[i].w, presets[i].h);
+	circle(presets[i].x, presets[i].y - presets[i].h/2 + 3*padding, presets[i].h);
+	circle(presets[i].x + presets[i].w, presets[i].y - presets[i].h/2 + 3*padding, presets[i].h);
+	if (mouseX > presets[i].x- presets[i].h/2 &&
+	    mouseX < presets[i].x + presets[i].w + presets[i].h/2 &&
+	    mouseY > presets[i].y -presets[i].h + 3*padding &&
+	    mouseY < presets[i].y + 3*padding) {
+	    fill("#98971A");
+	} else {
+	    fill("#EBDBB2");
+	}
+
+	text(presets[i].name, presets[i].x + 6*padding, presets[i].y);
+    }
+}
+
 function drawElectrons() {
     for (let i = 0; i < electrons.length; i++) {
 	let x = centerX + electrons[i].x / (scale*10**exponent) * stepSize;
@@ -1450,13 +1705,14 @@ function draw() {
     background("#EBDBB2");
     fill(128, 255, 128);
     handleKeys();
-    if (!paused && !homeMenu.open && !instructionsMenu.open) processPhysics();
+    if (!paused && !homeMenu.open && !instructionsMenu.open && !presetsMenu.open) processPhysics();
     drawCoordinatePlane();
     drawAtoms();
     drawElectrons();
     drawPositrons();
     drawGamma();
-    if (!homeMenu.open && !instructionsMenu.open) drawHud();
+    if (!homeMenu.open && !instructionsMenu.open && !presetsMenu.open) drawHud();
     if (homeMenu.open) drawHomeMenu();
     if (instructionsMenu.open) drawInstructionsMenu();
+    if (presetsMenu.open) drawPresetsMenu();
 }
