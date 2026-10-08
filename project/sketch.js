@@ -270,7 +270,7 @@ let offset = { x: 0, y: 0, };
 let cursor = { x: 0, y: 0, };
 let cursorSpeed = 800;
 let padding = 5;
-let dragging = false;
+let dragging = 0;
 let bar = {
     x: 0,
     w: 0,
@@ -346,7 +346,7 @@ function updateUIButton(id) {
 	UIButtons[id].h = bounds.h;
 	UIButtons[id].w = bounds.w;
 	UIButtons[id].x = 2*padding+ UIButtons[id].h + padding;
-	UIButtons[id].y = 3*padding + UIButtons[id].h;
+	UIButtons[id].y = 2*padding + UIButtons[id].h;
     }
 }
 
@@ -378,7 +378,7 @@ function setup() {
 }
 
 function mousePressed() {
-    dragging = false;
+    dragging = 0;
 }
 
 function drawButton(buttons, id) {
@@ -562,7 +562,7 @@ function mouseClicked() {
 	return;
     }
 
-    if (dragging) { return; }
+    if (dragging >= 10) { return; }
     let atom = {
 	symbol: currentAtom.symbol,
 	A: currentAtom.A,
@@ -869,7 +869,7 @@ function mouseDragged() {
     cursor.y += mouseY - pmouseY;
     centerY = offset.y + cursor.y;
     centerX = offset.x + cursor.x;
-    dragging = true;
+    dragging += 1;
 }
 
 function keyTyped() {
@@ -1277,7 +1277,7 @@ function drawInstructionsMenu() {
 
     let textHeight = 0;
     let textWidth = 0;
-    textSize(16);
+    textSize(24);
     let bBounds = textBounds("|", 0, 0);
     let maxH = bBounds.h;
     for (let i = 0; i < instructionText.length; i++) {
@@ -1333,7 +1333,7 @@ function drawInstructionsMenu() {
 
     text(instructionsMenu.button.label, instructionsMenu.button.x + 6*padding, instructionsMenu.button.y);
 
-    textSize(16);
+    textSize(24);
     fill("#32302F");
     let x = width/2 - textWidth/2;
     let y = instructionsMenu.button.y + 12*padding;
