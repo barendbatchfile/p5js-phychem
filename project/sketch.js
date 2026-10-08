@@ -28,107 +28,6 @@ let gamma = [];
 let electrons = [];
 let positrons = [];
 
-let presets = [
-    { name: "Orbit",
-      x: 0,
-      y: 0,
-      w: 0,
-      h: 0,
-      atoms: [
-	  {
-	      symbol: "H",
-	      A: 1,
-	      Z: 1,
-	      r: 31 * 1e-12,
-	      c: "#ff0000",
-	      halfTime: 0,
-	      alpha: false,
-	      betaMin: false,
-	      betaPlus: false,
-	      gamma: false,
-	      x: 200 * 1e-12,
-	      y: 0,
-	      vx: 0,
-	      vy: -9.415804192*10**-10,
-	      ax: 0,
-	      ay: 0,
-	  },
-	  {
-	      symbol: "H",
-	      A: 1,
-	      Z: 1,
-	      r: 31 * 1e-12,
-	      c: "#ff0000",
-	      halfTime: 0,
-	      alpha: false,
-	      betaMin: false,
-	      betaPlus: false,
-	      gamma: false,
-	      x: -200 * 1e-12,
-	      y: 0,
-	      vx: 0,
-	      vy: 9.415804192*10**-10,
-	      ax: 0,
-	      ay: 0,
-	  },
-	  {
-	      symbol: "H",
-	      A: 1,
-	      Z: 1,
-	      r: 31 * 1e-12,
-	      c: "#ff0000",
-	      halfTime: 0,
-	      alpha: false,
-	      betaMin: false,
-	      betaPlus: false,
-	      gamma: false,
-	      x: 0,
-	      y: -200 * 1e-12,
-	      vx: -9.415804192*10**-10,
-	      vy: 0,
-	      ax: 0,
-	      ay: 0,
-	  },
-	  {
-	      symbol: "H",
-	      A: 1,
-	      Z: 1,
-	      r: 31 * 1e-12,
-	      c: "#ff0000",
-	      halfTime: 0,
-	      alpha: false,
-	      betaMin: false,
-	      betaPlus: false,
-	      gamma: false,
-	      x: 0,
-	      y: 200 * 1e-12,
-	      vx: 9.415804192*10**-10,
-	      vy: 0,
-	      ax: 0,
-	      ay: 0,
-	  },
-	  {
-	      symbol: "O",
-	      A: 16,
-	      Z: 8,
-	      r: 66 * 1e-12,
-	      c: "#bbff00",
-	      halfTime: 0,
-	      alpha: false,
-	      betaMin: false,
-	      betaPlus: false,
-	      gamma: false,
-	      x: 0,
-	      y: 0,
-	      vx: 0,
-	      vy: 0,
-	      ax: 0,
-	      ay: 0,
-	  }
-      ],
-    }
-];
-
 let instructionsMenu = {
     open: false,
     title: {
@@ -140,10 +39,10 @@ let instructionsMenu = {
     },
     button: {
 	label: "back",
-	    x: 0,
-	    y: 0,
-	    w: 0,
-	    h: 0,
+	x: 0,
+	y: 0,
+	w: 0,
+	h: 0,
     },
 }
 
@@ -257,6 +156,108 @@ let physicsConstants = {
     C: 2.997e8,
     elektronRadius: 2.81794e-15,
 };
+
+let presets = [
+    {
+	name: "Orbit",
+	x: 0,
+	y: 0,
+	w: 0,
+	h: 0,
+	atoms: [
+	    {
+		symbol: "O",
+		A: 16,
+		Z: 8,
+		r: 66 * 1e-12,
+		c: "#bbff00",
+		halfTime: 0,
+		alpha: false,
+		betaMin: false,
+		betaPlus: false,
+		gamma: false,
+		x: 0,
+		y: 0,
+		vx: 0,
+		vy: 0,
+		ax: 0,
+		ay: 0,
+	    },
+	    {
+		symbol: "H",
+		A: 1,
+		Z: 1,
+		r: 31 * 1e-12,
+		c: "#ff0000",
+		halfTime: 0,
+		alpha: false,
+		betaMin: false,
+		betaPlus: false,
+		gamma: false,
+		x: 200 * 1e-12,
+		y: 0,
+		vx: 0,
+		vy: 0,
+		ax: 0,
+		ay: 0,
+	    },
+	    {
+		symbol: "H",
+		A: 1,
+		Z: 1,
+		r: 31 * 1e-12,
+		c: "#ff0000",
+		halfTime: 0,
+		alpha: false,
+		betaMin: false,
+		betaPlus: false,
+		gamma: false,
+		x: -200 * 1e-12,
+		y: 0,
+		vx: 0,
+		vy: 0,
+		ax: 0,
+		ay: 0,
+	    },
+	    {
+		symbol: "H",
+		A: 1,
+		Z: 1,
+		r: 31 * 1e-12,
+		c: "#ff0000",
+		halfTime: 0,
+		alpha: false,
+		betaMin: false,
+		betaPlus: false,
+		gamma: false,
+		x: 0,
+		y: -200 * 1e-12,
+		vx: 0,
+		vy: 0,
+		ax: 0,
+		ay: 0,
+	    },
+	    {
+		symbol: "H",
+		A: 1,
+		Z: 1,
+		r: 31 * 1e-12,
+		c: "#ff0000",
+		halfTime: 0,
+		alpha: false,
+		betaMin: false,
+		betaPlus: false,
+		gamma: false,
+		x: 0,
+		y: 200 * 1e-12,
+		vx: 0,
+		vy: 0,
+		ax: 0,
+		ay: 0,
+	    },
+	],
+    }
+];
 
 let secondsDay = 24 * 60 * 60;
 let secondsYear = 365.25*secondsDay;
@@ -493,6 +494,17 @@ function setup() {
     createCanvas(windowWidth, windowHeight);
     updateCenter();
     updateUIButtons();
+
+    let speed = Math.sqrt(physicsSettings.gravityMultiplier * presets[0].atoms[0].A * physicsConstants.atomicMass * physicsConstants.gravity/(200*1e-12));
+    for (let i = 1; i < presets[0].atoms.length; i++) {
+	speed *= -1;
+	if (i <= 2) {
+	    presets[0].atoms[i].vy = speed;
+	} else {
+	    presets[0].atoms[i].vx = speed;
+	}
+    }
+
     textSize(24);
     maxAtomDiamater = 2*max(width, height);
     let bounds = textBounds("W", 0, 0);
@@ -500,7 +512,6 @@ function setup() {
     for (let i = 0; i < periodicTable.length; i++) {
 	atomSelector.count += periodicTable[i].isotopes.length;
     }
-
 }
 
 function mousePressed() {
