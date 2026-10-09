@@ -167,6 +167,7 @@ let presets = [
 	atoms: [
 	    {
 		symbol: "O",
+		name: "Oxygen",
 		A: 16,
 		Z: 8,
 		r: 66 * 1e-12,
@@ -185,6 +186,7 @@ let presets = [
 	    },
 	    {
 		symbol: "H",
+		name: "Hydrogen",
 		A: 1,
 		Z: 1,
 		r: 31 * 1e-12,
@@ -203,6 +205,7 @@ let presets = [
 	    },
 	    {
 		symbol: "H",
+		name: "Hydrogen",
 		A: 1,
 		Z: 1,
 		r: 31 * 1e-12,
@@ -221,6 +224,7 @@ let presets = [
 	    },
 	    {
 		symbol: "H",
+		name: "Hydrogen",
 		A: 1,
 		Z: 1,
 		r: 31 * 1e-12,
@@ -239,6 +243,7 @@ let presets = [
 	    },
 	    {
 		symbol: "H",
+		name: "Hydrogen",
 		A: 1,
 		Z: 1,
 		r: 31 * 1e-12,
